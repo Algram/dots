@@ -1,0 +1,212 @@
+#
+# wm independent hotkeys
+#
+
+##########
+# CUSTOM #
+##########
+
+# Brightness controls
+XF86MonBrightnessDown
+  xbacklight -dec 10
+XF86MonBrightnessUp
+  xbacklight -inc 10
+
+# Audio controls
+XF86AudioLowerVolume
+  ~/.config/bspwm/volume down
+XF86AudioRaiseVolume
+  ~/.config/bspwm/volume up
+XF86AudioMute
+  ~/.config/bspwm/volume mute
+
+# screenshot area clipboard
+@super + shift + i
+  maim -s | xclip -selection clipboard -t image/png
+
+@super + shift + w
+  maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
+
+@super + shift + p
+	maim -st 0 | convert - -resize 1x1\! -format '#%[hex:u]' info:- | xclip -selection clipboard
+
+# Umlauts
+super + a
+  ~/.config/bspwm/key "a" "ä"
+
+super + shift + a
+  ~/.config/bspwm/key "a" "Ä"
+
+super + o
+  ~/.config/bspwm/key "o" "ö"
+
+super + shift + o
+  ~/.config/bspwm/key "o" "Ö"
+
+super + u
+  ~/.config/bspwm/key "u" "ü"
+
+super + shift + u
+  ~/.config/bspwm/key "u" "Ü"
+
+super + s
+  ~/.config/bspwm/key "s" "ß"
+
+# Screenshots
+@super + a
+  scrot -s
+
+# terminal emulator
+super + Return
+	urxvt
+
+# program launcher
+super + space
+  ~/.config/bspwm/launcher
+
+# clipmenu launcher
+ctrl + space
+  ~/.config/bspwm/launcher_clipmenu
+
+# lock
+super + l
+  ~/.config/bspwm/lock
+
+# suspend
+super + shift + s
+  systemctl suspend
+
+# make sxhkd reload its configuration files:
+super + Escape
+	pkill -USR1 -x sxhkd
+
+#
+# bspwm hotkeys
+#
+
+# quit bspwm normally
+super + alt + Escape
+	bspc quit
+
+# close and kill
+# super + {_,shift + }w
+	#bspc node -{c,k}
+
+# close
+super + w
+	bspc node -c
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# if the current node is automatic, send it to the last manual, otherwise pull the last leaf
+super + y
+	bspc query -N -n focused.automatic && bspc node -n last.!automatic || bspc node last.leaf -n focused
+
+# swap the current node and the biggest node
+super + g
+	bspc node -s biggest
+
+### Three finger swipe (left or right) to change desktop
+super + alt + {Left,Right}
+  bspc desktop -f {prev,next}
+
+
+#
+# state/flags
+#
+
+# set the window state
+super + {t,f,shift + f}
+	bspc node -t {tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {x,y,z}
+	bspc node -g {locked,sticky,private}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+super + {_,shift + }{h,j,k,l}
+	bspc node -{f,s} {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous node
+super + {_,shift + }c
+	bspc node -f {next.local,prev.local}
+
+# focus the next/previous desktop
+super + bracket{left,right}
+	bspc desktop -f {prev,next}
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# resize tiled/floating
+#
+
+# expand the tiled space in the given direction
+super + alt + {Left,Down,Up,Right}
+	bspc node {@west -r -10,@south -r +10,@north -r -10,@east -r +10}
+
+# contract the tiled space in the given direction
+super + alt + shift + {Left,Down,Up,Right}
+	bspc node {@east -r -10,@north -r +10,@south -r -10,@west -r +10}
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	xdo move {-x -20,-y +20,-y -20,-x +20}
+
+#
+# pointer focus/move/resize
+#
+
+# focus
+~button1
+	bspc pointer -g focus
+
+# start move/resize
+super + button{1-3}
+	bspc pointer -g {move,resize_side,resize_corner}
+
+# end move/resize
+super + @button{1-3}
+	bspc pointer -u

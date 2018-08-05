@@ -1,0 +1,2 @@
+#!/bin/bash
+rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort

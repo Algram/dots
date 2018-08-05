@@ -1,0 +1,2 @@
+#!/bin/bash
+xdotool keyup Super_L+$1 && xdotool type $2

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Start services
+sxhkd &
+compton -b --config ~/.config/compton.conf &
+polybar default &
+~/.config/bspwm/clipmenu/clipmenud &
+
+# Setup config
+xrdb -merge ~/.Xresources &
+xsetroot -cursor_name left_ptr &
+razercfg  -r 3500 &
+feh --bg-scale ~/.wallpaper.png &
+
+# Start applications
+dropbox start &
+
+firefox &
+
+code &
+
+urxvt &
+urxvt &
+urxvt &
+urxvt &
+
+signal-desktop &
+Discord &
+~/.electron-apps/whats-app/whats-app &

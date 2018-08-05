@@ -1,0 +1,82 @@
+!-------------------------------------------------------------------------------
+! Xft settings
+!-------------------------------------------------------------------------------
+
+Xft.antialias:              true
+Xft.rgba:                   rgb
+Xft.hinting:                true
+Xft.hintstyle:              hintslight
+
+!-------------------------------------------------------------------------------
+! URxvt settings
+!-------------------------------------------------------------------------------
+
+URxvt.depth:                256
+
+! Padding
+URxvt.internalBorder:       16
+
+! Fonts
+URxvt*font:                 xft:Roboto Mono:style=Regular:pixelsize=14
+URxvt*boldFont:             xft:Roboto Mono:style=Medium:pixelsize=14
+
+! Scrollbar
+URxvt.scrollStyle:          rxvt
+URxvt.scrollBar:            false
+
+! special #2e343f
+*.foreground:   #eeffff
+*.background:   #272b32
+*.cursorColor:  #c0c5ce
+
+! black
+*.color0:       #000000
+*.color8:       #272b32
+
+! red
+*.color1:       #d44956
+*.color9:       #d44956
+
+! green
+*.color2:       #c3e88d
+*.color10:      #c3e88d
+
+! yellow
+*.color3:       #fac55b
+*.color11:      #fac55b
+
+! blue
+*.color4:       #82aaff
+*.color12:      #82aaff
+
+! magenta
+*.color5:       #c792ea
+*.color13:      #c792ea
+
+! cyan
+*.color6:       #89ddff
+*.color14:      #89ddff
+
+! white
+*.color7:       #eeffff
+*.color15:      #8ca0aa
+
+URxvt.perl-ext-common: default,matcher,font-size
+URxvt.font-size.step: 4
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 1
+
+URxvt.matcher.rend.0: Uline Bold fg4
+
+URxvt.keysym.Shift-Control-V: eval:paste_clipboard
+URxvt.keysym.Shift-Control-C: eval:selection_to_clipboard
+URxvt.letterSpace: -1
+
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
+URxvt*scrollWithBuffer: true
+
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
