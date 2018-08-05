@@ -1,2 +1,7 @@
 #!/bin/bash
-rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort
+
+if [ $1 == "clipmenu" ] ; then
+  ~/.config/rofi/clipmenu/clipmenu -p clipboard
+else 
+  rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort
+fi

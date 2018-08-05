@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function progress_bar {
+	character=$1
+	amount=$2
+	filler=$3
+	maxAmount=$4
+
+	string=""
+
+	i=1
+	while [ "$i" -le "$maxAmount" ]; do
+		if [ "$i" -le "$amount" ]; then
+			string=$string$character
+		else
+			string=$string$filler
+		fi
+		i=$(($i + 1))
+	done
+
+	echo $string
+}
+
+
 function get_volume {
     amixer get Master | grep '%' | head -n 1 | cut -d '[' -f 2 | cut -d '%' -f 1
 }
@@ -9,29 +31,30 @@ function is_mute {
 }
 
 function send_notification {
-    volume=`get_volume`
-    bar=$(seq -s "--" $(($volume / 5)) | sed 's/[0-9]//g')
+	volume=$(get_volume)
 
-    ~/.config/dunst/dunstify -i audio-volume-muted-blocking -t 1000 -r 2593 -u low "墳 $bar"
+	if is_mute ; then
+		bar="婢 Mute"
+	else
+		bar=$(progress_bar █ $(($volume / 3)) " " 30)
+	fi
+
+	~/.config/dunst/dunstify -t 1000 -r 1001 -u low "$bar"
 }
 
 case $1 in
-    up)
+	up)
 		amixer -D pulse set Master on > /dev/null
-		amixer -D pulse sset Master 8%+ > /dev/null
+		amixer -D pulse sset Master 7%+ > /dev/null
 		send_notification
 	;;
-    down)
+	down)
 		amixer -D pulse set Master on > /dev/null
-		amixer -D pulse sset Master 8%- > /dev/null
+		amixer -D pulse sset Master 7%- > /dev/null
 		send_notification
 	;;
-    mute)
+	mute)
 		amixer -D pulse set Master 1+ toggle > /dev/null
-		if is_mute ; then
-			dunstify -i audio-volume-muted -t 1000 -r 2593 -u low "婢 Mute"
-		else
-			send_notification
-		fi
+		send_notification
 	;;
 esac

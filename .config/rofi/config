@@ -1,5 +1,5 @@
 rofi.show-icons:            true
-rofi.modi:                  drun,ssh,calc,emoji:~/.config/rofi/emoji
+rofi.modi:                  drun,ssh,calc,emoji:~/.config/rofi/emoji/emoji
 rofi.lines:                 8
 rofi.matching:              fuzzy
 rofi.font:                  Roboto Mono 14px

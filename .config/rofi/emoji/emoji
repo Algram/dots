@@ -2,7 +2,7 @@
 
 VER='11.0'
 URL="https://www.unicode.org/Public/emoji/${VER}/emoji-test.txt"
-DIR="$HOME/.config/rofi"
+DIR="$HOME/.config/rofi/emoji"
 FILE="$DIR/emoji.txt"
 
 if [ ! -r $FILE ]

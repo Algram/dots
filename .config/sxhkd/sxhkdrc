@@ -22,7 +22,7 @@ XF86AudioMute
 
 # screenshot area clipboard
 @super + shift + i
-  maim -s | xclip -selection clipboard -t image/png
+  maim -l -b 0 -c 0,0,0,0.5 -s | xclip -selection clipboard -t image/png
 
 @super + shift + w
   maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
@@ -62,12 +62,11 @@ super + Return
 
 # program launcher
 super + space
-  ~/.config/bspwm/launcher
+  ~/.config/bspwm/launcher default
 
 # clipmenu launcher
 ctrl + space
-  ~/.config/bspwm/launcher_clipmenu
-
+  ~/.config/bspwm/launcher clipmenu
 # lock
 super + l
   ~/.config/bspwm/lock

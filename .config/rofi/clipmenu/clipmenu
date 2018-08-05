@@ -49,7 +49,7 @@ else
     # argument to override an earlier one. That is, if the user passes in `-l`, our
     # one will be ignored.
     chosen_line=$(
-        list_clips | "$CM_LAUNCHER" -l 8 "$@"
+        list_clips | "$CM_LAUNCHER" "$@"
     )
 fi
 
