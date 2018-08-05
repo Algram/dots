@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Utility for volume control and a notification popup with dunst.
+# 
+# Examples:
+# ./volume up       -->			Increase volume by 8
+# ./volume down     -->			Decrease volume by 8
+# ./volume mute     -->			Mute
+
 function progress_bar {
 	character=$1
 	amount=$2

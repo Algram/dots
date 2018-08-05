@@ -1,10 +1,8 @@
-#
-# wm independent hotkeys
-#
+#### SXHKD hotkeys ####
 
-##########
-# CUSTOM #
-##########
+# Reload config
+super + Escape
+	pkill -USR1 -x sxhkd
 
 # Brightness controls
 XF86MonBrightnessDown
@@ -20,13 +18,15 @@ XF86AudioRaiseVolume
 XF86AudioMute
   ~/.config/bspwm/volume mute
 
-# screenshot area clipboard
+# Screenshot of the selected area
 @super + shift + i
   maim -l -b 0 -c 0,0,0,0.5 -s | xclip -selection clipboard -t image/png
 
+# Screenshot of a window
 @super + shift + w
   maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
 
+# Color picker
 @super + shift + p
 	maim -st 0 | convert - -resize 1x1\! -format '#%[hex:u]' info:- | xclip -selection clipboard
 
@@ -52,160 +52,119 @@ super + shift + u
 super + s
   ~/.config/bspwm/key "s" "ß"
 
-# Screenshots
-@super + a
-  scrot -s
-
-# terminal emulator
+# Terminal emulator
 super + Return
 	urxvt
 
-# program launcher
+# Program launcher
 super + space
   ~/.config/bspwm/launcher default
 
-# clipmenu launcher
+# Clipmenu launcher
 ctrl + space
   ~/.config/bspwm/launcher clipmenu
-# lock
+
+# Lock
 super + l
   ~/.config/bspwm/lock
 
-# suspend
+# Suspend
 super + shift + s
   systemctl suspend
 
-# make sxhkd reload its configuration files:
-super + Escape
-	pkill -USR1 -x sxhkd
 
-#
-# bspwm hotkeys
-#
+#### BSPWM hotkeys ####
 
-# quit bspwm normally
+# Quit bspwm normally
 super + alt + Escape
 	bspc quit
 
-# close and kill
-# super + {_,shift + }w
-	#bspc node -{c,k}
-
-# close
+# Close
 super + w
 	bspc node -c
 
-# alternate between the tiled and monocle layout
+# Alternate between the tiled and monocle layout
 super + m
 	bspc desktop -l next
 
-# if the current node is automatic, send it to the last manual, otherwise pull the last leaf
+# If the current node is automatic, send it to the last manual, otherwise pull the last leaf
 super + y
 	bspc query -N -n focused.automatic && bspc node -n last.!automatic || bspc node last.leaf -n focused
-
-# swap the current node and the biggest node
-super + g
-	bspc node -s biggest
 
 ### Three finger swipe (left or right) to change desktop
 super + alt + {Left,Right}
   bspc desktop -f {prev,next}
 
-
-#
-# state/flags
-#
-
-# set the window state
+# Set the window state
 super + {t,f,shift + f}
 	bspc node -t {tiled,floating,fullscreen}
 
-# set the node flags
+# Set the node flags
 super + ctrl + {x,y,z}
 	bspc node -g {locked,sticky,private}
 
-#
-# focus/swap
-#
-
-# focus the node in the given direction
+# Focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
 
-# focus the node for the given path jump
+# Focus the node for the given path jump
 super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
-# focus the next/previous node
+# Focus the next/previous node
 super + {_,shift + }c
 	bspc node -f {next.local,prev.local}
 
-# focus the next/previous desktop
+# Focus the next/previous desktop
 super + bracket{left,right}
 	bspc desktop -f {prev,next}
 
-# focus the last node/desktop
-super + {grave,Tab}
-	bspc {node,desktop} -f last
-
-# focus the older or newer node in the focus history
+# Focus the older or newer node in the focus history
 super + {o,i}
 	bspc wm -h off; \
 	bspc node {older,newer} -f; \
 	bspc wm -h on
 
-# focus or send to the given desktop
+# Focus or send to the given desktop
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
-#
-# preselect
-#
-
-# preselect the direction
+# Preselect the direction
 super + ctrl + {h,j,k,l}
 	bspc node -p {west,south,north,east}
 
-# preselect the ratio
+# Preselect the ratio
 super + ctrl + {1-9}
 	bspc node -o 0.{1-9}
 
-# cancel the preselection for the focused node
+# Cancel the preselection for the focused node
 super + ctrl + space
 	bspc node -p cancel
 
-# cancel the preselection for the focused desktop
+# Cancel the preselection for the focused desktop
 super + ctrl + shift + space
 	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
-#
-# resize tiled/floating
-#
-
-# expand the tiled space in the given direction
+# Expand the tiled space in the given direction
 super + alt + {Left,Down,Up,Right}
 	bspc node {@west -r -10,@south -r +10,@north -r -10,@east -r +10}
 
-# contract the tiled space in the given direction
+# Contract the tiled space in the given direction
 super + alt + shift + {Left,Down,Up,Right}
 	bspc node {@east -r -10,@north -r +10,@south -r -10,@west -r +10}
 
-# move a floating window
+# Move a floating window
 super + {Left,Down,Up,Right}
 	xdo move {-x -20,-y +20,-y -20,-x +20}
 
-#
-# pointer focus/move/resize
-#
-
-# focus
+# Focus
 ~button1
 	bspc pointer -g focus
 
-# start move/resize
+# Start move/resize
 super + button{1-3}
 	bspc pointer -g {move,resize_side,resize_corner}
 
-# end move/resize
+# End move/resize
 super + @button{1-3}
 	bspc pointer -u
