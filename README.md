@@ -60,3 +60,5 @@ dots submodule update --init --recursive $HOME/
 - oh-my-zsh
 - neovim
 - bat
+- redshift
+- translate-shell

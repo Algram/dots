@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Rofi script for translating words.
+# By default it translates everything into English.
+# If a custom prefix like "de" is supplied, it will translate into that language instead.
+# 
+# Examples:
+# Hinterhalt    -->			ambush
+# Bonjour       -->     hello
+# de ambush     -->     Hinterhalt
+# de Hello      -->     Hallo
+
+IFS=' ' read arg1 arg2 <<< $1
+
+if [[ $arg1 == "de" || $arg1 == "en" ]] ; then
+  echo $(trans -b :$arg1 $arg2)
+else 
+  echo $(trans -b :en $1)
+fi

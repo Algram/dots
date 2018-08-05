@@ -5,6 +5,7 @@ sxhkd &
 compton -b --config ~/.config/compton.conf &
 polybar default &
 ~/.config/rofi/clipmenu/clipmenud &
+redshift -t 5500:3500 -l 52.5200:13.405 &
 
 # Setup config
 xrdb -merge ~/.Xresources &

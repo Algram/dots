@@ -25,6 +25,7 @@
     show_indicators = no
     max_icon_size = 48
     icon_folders = /usr/share/icons/Numix-Circle/48/
+    mouse_left_click = do_action
 
 [frame]
     width = 0
