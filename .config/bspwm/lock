@@ -1,53 +1,31 @@
 #!/bin/bash
 
-lock() {
-	#$1 image path
-	letterEnteredColor=d23c3dff
-	letterRemovedColor=d23c3dff
-	passwordCorrect=00000000
-	passwordIncorrect=d23c3dff
-	background=00000000
-	foreground=ffffffff
-	i3lock \
-		-t -i "$1" \
-		--timepos="x+110:h-70" \
-		--datepos="x+135:h-45" \
-		--clock --datestr "Type password to unlock..." \
-		--insidecolor=$background --ringcolor=$foreground --line-uses-inside \
-		--keyhlcolor=$letterEnteredColor --bshlcolor=$letterRemovedColor --separatorcolor=$background \
-		--insidevercolor=$passwordCorrect --insidewrongcolor=$passwordIncorrect \
-		--ringvercolor=$foreground --ringwrongcolor=$foreground --indpos="x+280:h-70" \
-		--radius=20 --ring-width=4 --veriftext="" --wrongtext="" \
-		--verifcolor="$foreground" --timecolor="$foreground" --datecolor="$foreground" \
-		--noinputtext="" --force-clock $lockargs
-	
+# TMPBG=/tmp/screen.png
+# LOCK=$HOME/lock.png
+# RES=$(xrandr | grep 'current' | sed -E 's/.*current\s([0-9]+)\sx\s([0-9]+).*/\1x\2/')
+ 
+# # ffmpeg -f x11grab -video_size $RES -y -i $DISPLAY -i $LOCK -filter_complex "boxblur=5:5:5,overlay=(main_w-overlay_w)/(main_w-overlay_w):(main_h-overlay_h)" -vframes 1 $TMPBG -loglevel quiet
+# ffmpeg -f x11grab -video_size $RES -y -i $DISPLAY  -filter_complex "boxblur=6:6:6" -vframes 1 $TMPBG -loglevel quiet
+# i3lock -u -i $TMPBG
+# rm $TMPBG
 
+letterEnteredColor=#d44956ff
+letterRemovedColor=#d44956ff
+passwordCorrect=#00000000
+passwordIncorrect=#d44956ff
+background=#00000000
+foreground=#ffffffff
 
 i3lock \
---insidevercolor="#00000000"   \
---ringvercolor="#82aaffff"     \
-\
---insidewrongcolor="#00000000" \
---ringwrongcolor="#d44956ff"   \
-\
---insidecolor="#00000000"      \
---ringcolor="#ffffffff"        \
---linecolor="#00000000"        \
---separatorcolor="#00000000"   \
---keyhlcolor="#82aaffff"       \
---bshlcolor="#82aaffff"        \
---separatorcolor="#00000000" \
---screen 2            \
---indicator \
---radius 32 --blur 4 \
---veriftext "" --wrongtext "" --noinputtext "" --locktext "" --lockfailedtext ""
-}
-
-TMPBG=/tmp/screen.png
-LOCK=$HOME/lock.png
-RES=$(xrandr | grep 'current' | sed -E 's/.*current\s([0-9]+)\sx\s([0-9]+).*/\1x\2/')
- 
-# ffmpeg -f x11grab -video_size $RES -y -i $DISPLAY -i $LOCK -filter_complex "boxblur=5:5:5,overlay=(main_w-overlay_w)/(main_w-overlay_w):(main_h-overlay_h)" -vframes 1 $TMPBG -loglevel quiet
-ffmpeg -f x11grab -video_size $RES -y -i $DISPLAY  -filter_complex "boxblur=6:6:6" -vframes 1 $TMPBG -loglevel quiet
-i3lock -u -i $TMPBG
-rm $TMPBG
+  -i "$HOME/.config/bspwm/lock.png" \
+	--timestr="%H:%M" \
+	--timepos="x+85:h-70" \
+	--datepos="x+135:h-45" \
+	--clock --datestr "Type password to unlock..." \
+	--insidecolor=$background --ringcolor=$foreground --line-uses-inside \
+	--keyhlcolor=$letterEnteredColor --bshlcolor=$letterRemovedColor --separatorcolor=$background \
+	--insidevercolor=$passwordCorrect --insidewrongcolor=$passwordIncorrect \
+	--ringvercolor=$foreground --ringwrongcolor=$foreground --indpos="x+270:h-68" \
+	--radius=20 --ring-width=4 --veriftext="" --wrongtext="" --blur 4 \
+	--verifcolor="$foreground" --timecolor="$foreground" --datecolor="$foreground" \
+	--noinputtext="" --force-clock $lockargs
