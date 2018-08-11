@@ -62,3 +62,6 @@ dots submodule update --init --recursive $HOME/
 - bat
 - redshift
 - translate-shell
+- mpv
+- qalculate
+- gopass

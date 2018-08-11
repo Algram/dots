@@ -10,10 +10,12 @@
 # de ambush     -->     Hinterhalt
 # de Hello      -->     Hallo
 
-IFS=' ' read arg1 arg2 <<< $1
+if [ "$@" ] ; then
+  IFS=' ' read arg1 arg2 <<< $1
 
-if [[ $arg1 == "de" || $arg1 == "en" ]] ; then
-  echo $(trans -b :$arg1 $arg2)
-else 
-  echo $(trans -b :en $1)
+  if [[ $arg1 == "de" || $arg1 == "en" ]] ; then
+    echo $(trans -b :$arg1 $arg2)
+  else 
+    echo $(trans -b :en $1)
+  fi
 fi

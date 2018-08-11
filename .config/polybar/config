@@ -34,7 +34,7 @@ height = 32
 ;offset-x = 1%
 ;offset-y = 1%
 radius = 0
-fixed-center = false
+fixed-center = true
 
 background = ${colors.background}
 foreground = ${colors.foreground}
@@ -56,8 +56,8 @@ font-1 = RobotoMono Nerd Font:pixelsize=13;3
 font-2 = siji:pixelsize=11;1
 
 modules-left = bspwm
-modules-center =
-modules-right = alsa date powermenu
+modules-center = date
+modules-right = alsa powermenu
 
 tray-position =
 tray-padding = 0
@@ -152,17 +152,16 @@ card = intel_backlight
 type = internal/date
 interval = 5
 
-date =
-date-alt = " %d/%m"
+date = " %a %d %b"
+date-alt = ""
 
-time = %H:%M
-time-alt = %H:%M
+time = "   %H:%M"
+time-alt = ""
 
 format-background = #2e343f
 format-padding = 1
-
-format-prefix = 
 format-prefix-foreground = ${colors.foreground}
+
 label = %date% %time%
 
 [module/alsa]
@@ -199,7 +198,7 @@ format-padding = 2
 menu-0-0 = suspend
 menu-0-0-exec = systemctl suspend
 menu-0-1 = shutdown
-menu-0-1-exec = systemctl shutdown
+menu-0-1-exec = systemctl poweroff
 
 label-open = 襤
 label-close = 

@@ -64,6 +64,10 @@ super + space
 ctrl + space
   ~/.config/bspwm/launcher clipmenu
 
+# Gopass launcher
+alt + space
+  ~/.config/bspwm/launcher gopass
+
 # Lock
 super + l
   ~/.config/bspwm/lock
