@@ -4,3 +4,6 @@ rofi.lines:                 8
 rofi.matching:              fuzzy
 rofi.font:                  Roboto Mono 14px
 rofi.theme:                 ~/.config/rofi/theme.rasi
+rofi.kb-row-tab:              
+rofi.kb-mode-next:          Tab
+rofi.kb-mode-previous:      Shift+Tab

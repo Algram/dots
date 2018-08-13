@@ -79,6 +79,10 @@ super + shift + s
 
 #### BSPWM hotkeys ####
 
+# Rotate nodes
+super + Tab
+	bspc node @/ -R 90
+
 # Quit bspwm normally
 super + alt + Escape
 	bspc quit

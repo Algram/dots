@@ -26,6 +26,7 @@ bspc rule -a Signal desktop=^4
 bspc rule -a whats-app-nativefier-d52542 desktop=^4
 bspc rule -a TelegramDesktop desktop=^4
 bspc rule -a Nautilus desktop=^5
+bspc rule -a Peek state=floating
 
 # Autostart
 ~/.config/bspwm/autostart &

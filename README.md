@@ -65,3 +65,4 @@ dots submodule update --init --recursive $HOME/
 - mpv
 - qalculate
 - gopass
+- streamlink

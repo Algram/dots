@@ -10,7 +10,7 @@
 if [ $1 == "clipmenu" ] ; then
   ~/.config/rofi/clipmenu/clipmenu -p clipboard
 elif [ $1 == "gopass" ] ; then
-  gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/Documents/development/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
-else 
+  ~/Documents/development/golang/bin/gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/Documents/development/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
+else
   rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort
 fi

@@ -30,11 +30,11 @@ function progress_bar {
 
 
 function get_volume {
-    amixer get Master | grep '%' | head -n 1 | cut -d '[' -f 2 | cut -d '%' -f 1
+  amixer get Master | grep '%' | head -n 1 | cut -d '[' -f 2 | cut -d '%' -f 1
 }
 
 function is_mute {
-    amixer get Master | grep '%' | grep -oE '[^ ]+$' | grep off > /dev/null
+  amixer get Master | grep '%' | grep -oE '[^ ]+$' | grep off > /dev/null
 }
 
 function send_notification {
@@ -43,9 +43,10 @@ function send_notification {
 	if is_mute ; then
 		bar="婢 Mute"
 	else
-		bar=$(progress_bar █ $(($volume / 3)) " " 30)
+		bar=$(progress_bar █ $(($volume / 3)) " " 30	)
 	fi
 
+	# Send the volume indicator notification with dunst
 	~/.config/dunst/dunstify -t 1000 -r 1001 -u low "$bar"
 }
 
@@ -53,11 +54,19 @@ case $1 in
 	up)
 		amixer -D pulse set Master on > /dev/null
 		amixer -D pulse sset Master 7%+ > /dev/null
+
+		# Play the freedesktop volume change sound
+  	play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+
 		send_notification
 	;;
 	down)
 		amixer -D pulse set Master on > /dev/null
 		amixer -D pulse sset Master 7%- > /dev/null
+
+		# Play the freedesktop volume change sound
+  	play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+
 		send_notification
 	;;
 	mute)
