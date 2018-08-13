@@ -8,5 +8,4 @@
 # super + shift + a -->     Ä
 # super + s         -->     ß
 
-
 xdotool keyup Super_L+$1 && xdotool type $2

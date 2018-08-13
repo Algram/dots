@@ -8,24 +8,24 @@
 # ./volume mute     -->			Mute
 
 function progress_bar {
-	character=$1
-	amount=$2
-	filler=$3
-	maxAmount=$4
+  character=$1
+  amount=$2
+  filler=$3
+  maxAmount=$4
 
-	string=""
+  string=""
 
-	i=1
-	while [ "$i" -le "$maxAmount" ]; do
-		if [ "$i" -le "$amount" ]; then
-			string=$string$character
-		else
-			string=$string$filler
-		fi
-		i=$(($i + 1))
-	done
+  i=1
+  while [ "$i" -le "$maxAmount" ]; do
+    if [ "$i" -le "$amount" ]; then
+      string=$string$character
+    else
+      string=$string$filler
+    fi
+    i=$(($i + 1))
+  done
 
-	echo $string
+  echo $string
 }
 
 
@@ -38,39 +38,39 @@ function is_mute {
 }
 
 function send_notification {
-	volume=$(get_volume)
+  volume=$(get_volume)
 
-	if is_mute ; then
-		bar="婢 Mute"
-	else
-		bar=$(progress_bar █ $(($volume / 3)) " " 30	)
-	fi
+  if is_mute ; then
+    bar="婢 Mute"
+  else
+    bar=$(progress_bar █ $(($volume / 3)) " " 30)
+  fi
 
-	# Send the volume indicator notification with dunst
-	~/.config/dunst/dunstify -t 1000 -r 1001 -u low "$bar"
+  # Send the volume indicator notification with dunst
+  ~/.config/dunst/dunstify -t 1000 -r 1001 -u low "$bar"
 }
 
 case $1 in
-	up)
-		amixer -D pulse set Master on > /dev/null
-		amixer -D pulse sset Master 7%+ > /dev/null
+  up)
+    amixer -D pulse set Master on > /dev/null
+    amixer -D pulse sset Master 7%+ > /dev/null
 
-		# Play the freedesktop volume change sound
-  	play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+    # Play the freedesktop volume change sound
+    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
 
-		send_notification
-	;;
-	down)
-		amixer -D pulse set Master on > /dev/null
-		amixer -D pulse sset Master 7%- > /dev/null
+    send_notification
+  ;;
+  down)
+    amixer -D pulse set Master on > /dev/null
+    amixer -D pulse sset Master 7%- > /dev/null
 
-		# Play the freedesktop volume change sound
-  	play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+    # Play the freedesktop volume change sound
+    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
 
-		send_notification
-	;;
-	mute)
-		amixer -D pulse set Master 1+ toggle > /dev/null
-		send_notification
-	;;
+    send_notification
+  ;;
+  mute)
+    amixer -D pulse set Master 1+ toggle > /dev/null
+    send_notification
+  ;;
 esac
