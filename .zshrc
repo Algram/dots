@@ -11,7 +11,6 @@ plugins=(git zsh-autosuggestions)
 source $ZSH/oh-my-zsh.sh
 
 alias upgrade='sudo dnf upgrade --refresh'
-alias vim='nvim'
 alias cat='bat'
 
 alias h='cd --'

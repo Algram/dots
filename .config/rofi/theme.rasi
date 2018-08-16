@@ -1,5 +1,5 @@
 * {
-  background-color: #272b32;
+  background-color: #282C33;
   border-color: #2e343f;
   text-color: #8ca0aa;
 
@@ -18,9 +18,10 @@ prompt {
 }
 
 textbox {
-  background-color: #89ddff;
+  background-color: #2e343f;
+  border: 0 0 1px 0;
+  border-color: #282C33;
   padding: 8px 16px;
-  text-color: #272b32;
 }
 
 entry {

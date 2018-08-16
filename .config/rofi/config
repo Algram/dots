@@ -1,4 +1,3 @@
-rofi.show-icons:            true
 rofi.modi:                  drun,ssh,calc,emoji:~/.config/rofi/emoji/emoji,translate:~/.config/rofi/translate
 rofi.lines:                 8
 rofi.matching:              fuzzy

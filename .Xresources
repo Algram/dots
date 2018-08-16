@@ -24,42 +24,42 @@ URxvt*boldFont:             xft:Roboto Mono:style=Medium:pixelsize=14
 URxvt.scrollStyle:          rxvt
 URxvt.scrollBar:            false
 
-! special #2e343f
+! special
 *.foreground:   #eeffff
-*.background:   #272b32
+*.background:   #282C33
 *.cursorColor:  #c0c5ce
 
 ! black
-*.color0:       #46465a
-*.color8:       #272b32
+*.color0:       #2e343f
+*.color8:       #282C33
 
 ! red
-*.color1:       #d44956
-*.color9:       #d44956
+*.color1:       #DE5062
+*.color9:       #C44450
 
 ! green
-*.color2:       #c3e88d
-*.color10:      #c3e88d
+*.color2:       #8CDBAB
+*.color10:      #76B88F
 
 ! yellow
 *.color3:       #fac55b
-*.color11:      #fac55b
+*.color11:      #E8B353
 
 ! blue
-*.color4:       #82aaff
-*.color12:      #82aaff
+*.color4:       #7CA9DB
+*.color12:      #719AC7
 
 ! magenta
 *.color5:       #c792ea
-*.color13:      #c792ea
+*.color13:      #AB7EC9
 
 ! cyan
 *.color6:       #89ddff
-*.color14:      #89ddff
+*.color14:      #79C2E0
 
 ! white
 *.color7:       #eeffff
-*.color15:      #8ca0aa
+*.color15:      #646E7F
 
 URxvt.perl-ext-common: default,matcher,font-size
 URxvt.font-size.step: 4

@@ -9,9 +9,10 @@ redshift -t 5200:3200 -l 52.5200:13.405 &
 
 # Setup config
 source ~/.zshrc &
+setxkbmap &
 xrdb -merge ~/.Xresources &
 xsetroot -cursor_name left_ptr &
-feh --bg-scale ~/.wallpaper.png &
+feh --bg-scale ~/.wallpaper.jpg &
 
 # Start applications
 dropbox start &

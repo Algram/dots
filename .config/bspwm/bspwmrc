@@ -16,6 +16,7 @@ bspc config focus_follows_pointer false
 # Setup desktops
 bspc monitor -d web dev term social misc
 bspc desktop web -l monocle
+bspc desktop dev -l monocle
 
 # Application specific rules
 bspc rule -a Firefox desktop=^1

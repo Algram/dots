@@ -1,3 +1,4 @@
+
 # Dots
 
 ## Setup
@@ -66,3 +67,4 @@ dots submodule update --init --recursive $HOME/
 - qalculate
 - gopass
 - streamlink
+- gsimplecal

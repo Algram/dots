@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if pgrep -x "gsimplecal" > /dev/null; then
+    echo "running" >> ~/log.txt
+    pkill gsimplecal
+else
+    echo "not running" >> ~/log.txt
+    gsimplecal
+fi
