@@ -7,9 +7,9 @@
 # ./launcher clipmenu   -->			Show a rofi launcher in dmenu mode with clipmenu piped into it
 # ./launcher gopass     -->			Show a rofi launcher in dmenu mode with gopass piped into it
 
-if [ $1 == "clipmenu" ] ; then
+if [ $1 == "clipmenu" ]; then
   ~/.config/rofi/clipmenu/clipmenu -p clipboard
-elif [ $1 == "gopass" ] ; then
+elif [ $1 == "gopass" ]; then
   ~/Documents/development/golang/bin/gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/Documents/development/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
 else
   rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort -show-icons

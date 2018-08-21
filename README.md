@@ -53,7 +53,7 @@ dots submodule update --init --recursive $HOME/
 - i3lock-color (https://github.com/PandorasFox/i3lock-color)
 - materia-light-compact (gtk-theme)
 - numix-circle (icon-theme)
-- urxvt
+- urxvt256c
 - maim
 - feh
 - razercfg
@@ -67,3 +67,4 @@ dots submodule update --init --recursive $HOME/
 - gopass
 - streamlink
 - gsimplecal
+- nerdfonts (Roboto Mono)

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Utility for maim as a screenshot/color picker tool
+
+if [ $1 == "area" ]; then
+  maim -l -b 0 -c 0,0,0,0.5 -st 0 -u | xclip -selection clipboard -t image/png
+elif [ $1 == "window" ]; then
+  maim -l -b 0 -c 0,0,0,0.5 -st 9999999 -u | convert - \( +clone -background black -shadow 128x16+0+0 \) +swap -background none -layers merge +repage ~/Pictures/$(date +%s).png
+elif [ $1 == "color" ]; then
+  maim -st 0 | convert - -resize 1x1\! -format '#%[hex:u]' info:- | sed 's/..$//' | xclip -selection clipboard
+fi

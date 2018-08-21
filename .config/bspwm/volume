@@ -3,31 +3,9 @@
 # Utility for volume control and a notification popup with dunst.
 # 
 # Examples:
-# ./volume up       -->			Increase volume by 8
-# ./volume down     -->			Decrease volume by 8
+# ./volume up       -->			Increase volume by 7
+# ./volume down     -->			Decrease volume by 7
 # ./volume mute     -->			Mute
-
-function progress_bar {
-  character=$1
-  amount=$2
-  filler=$3
-  maxAmount=$4
-
-  string=""
-
-  i=1
-  while [ "$i" -le "$maxAmount" ]; do
-    if [ "$i" -le "$amount" ]; then
-      string=$string$character
-    else
-      string=$string$filler
-    fi
-    i=$(($i + 1))
-  done
-
-  echo $string
-}
-
 
 function get_volume {
   amixer get Master | grep '%' | head -n 1 | cut -d '[' -f 2 | cut -d '%' -f 1
@@ -41,9 +19,41 @@ function send_notification {
   volume=$(get_volume)
 
   if is_mute ; then
-    bar="婢 Mute"
+    bar="婢  Mute"
+  elif [ $volume -eq 100 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 98 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 91 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 84 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 77 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 70 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 63 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 56 ]; then
+    bar="墳  ━━━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 49 ]; then
+    bar="奔  ━━━━━━━━━━━━━━━"
+  elif [ $volume -gt 42 ]; then
+    bar="奔  ━━━━━━━━━━━━━"
+  elif [ $volume -gt 35 ]; then
+    bar="奔  ━━━━━━━━━━━"
+  elif [ $volume -gt 28 ]; then
+    bar="奔  ━━━━━━━━━"
+  elif [ $volume -gt 21 ]; then
+    bar="奄  ━━━━━━━"
+  elif [ $volume -gt 14 ]; then
+    bar="奄  ━━━━━"
+  elif [ $volume -gt 7 ]; then
+    bar="奄  ━━━━"
+  elif [ $volume -gt 0 ]; then
+    bar="奄  ━━"
   else
-    bar=$(progress_bar █ $(($volume / 3)) " " 30)
+    bar="奄"
   fi
 
   # Send the volume indicator notification with dunst
@@ -56,7 +66,7 @@ case $1 in
     amixer -D pulse sset Master 7%+ > /dev/null
 
     # Play the freedesktop volume change sound
-    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &
 
     send_notification
   ;;
@@ -65,7 +75,7 @@ case $1 in
     amixer -D pulse sset Master 7%- > /dev/null
 
     # Play the freedesktop volume change sound
-    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+    play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &
 
     send_notification
   ;;

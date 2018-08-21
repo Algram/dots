@@ -9,7 +9,7 @@
     show_age_threshold = 60
     word_wrap = yes
     ignore_newline = no
-    geometry = "356x32-780+32"
+    geometry = "356x32-780+40"
     transparency = 0
     idle_threshold = 120
     monitor = 0
@@ -19,7 +19,7 @@
     separator_height = 2
     padding = 12
     horizontal_padding = 12
-    separator_color = "#667A9F"
+    separator_color = "#646E7F"
     startup_notification = false
     icon_position = left
     show_indicators = no
@@ -29,7 +29,7 @@
 
 [frame]
     width = 0
-    color = "#667A9F"
+    color = "#646E7F"
 
 [shortcuts]
     close =

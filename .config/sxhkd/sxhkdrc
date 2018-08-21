@@ -20,15 +20,15 @@ XF86AudioMute
 
 # Screenshot of the selected area
 @super + shift + i
-  maim -l -b 0 -c 0,0,0,0.5 -s | xclip -selection clipboard -t image/png
+  ~/.config/bspwm/screenshot area
 
 # Screenshot of a window
 @super + shift + w
-  maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
+ ~/.config/bspwm/screenshot window
 
 # Color picker
 @super + shift + p
-	maim -st 0 | convert - -resize 1x1\! -format '#%[hex:u]' info:- | sed 's/..$//' | xclip -selection clipboard
+	~/.config/bspwm/screenshot color
 
 # Umlauts
 super + a
@@ -54,7 +54,7 @@ super + s
 
 # Terminal emulator
 super + Return
-	urxvt
+	urxvt256c
 
 # Program launcher
 super + space
