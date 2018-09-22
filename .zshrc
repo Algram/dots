@@ -12,6 +12,7 @@ source $ZSH/oh-my-zsh.sh
 
 alias upgrade='sudo dnf upgrade --refresh'
 alias cat='bat'
+alias tldr='tldr --theme ocean'
 
 alias h='cd --'
 alias r='cd /'

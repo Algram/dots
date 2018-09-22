@@ -68,3 +68,4 @@ dots submodule update --init --recursive $HOME/
 - streamlink
 - gsimplecal
 - nerdfonts (Roboto Mono)
+- tldr
