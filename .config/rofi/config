@@ -1,7 +1,7 @@
 rofi.modi:                  drun,ssh,calc,emoji:~/.config/rofi/emoji/emoji,translate:~/.config/rofi/translate
 rofi.lines:                 8
 rofi.matching:              fuzzy
-rofi.font:                  Roboto Mono 14px
+rofi.font:                  Roboto Mono 13
 rofi.theme:                 ~/.config/rofi/theme.rasi
 rofi.kb-row-tab:              
 rofi.kb-mode-next:          Tab
