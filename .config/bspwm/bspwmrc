@@ -3,7 +3,7 @@
 # Basic bspwm config
 bspc config border_width          0
 bspc config window_gap            16
-bspc config top_padding           32
+bspc config top_padding           36
 
 bspc config split_ratio           0.52
 bspc config borderless_monocle    true
@@ -14,6 +14,8 @@ bspc config click_to_focus        true
 bspc config focus_follows_pointer false
 
 # Setup desktops
+# bspc monitor DP-1 -d web dev term social misc
+# bspc monitor HDMI-1 -d dump
 bspc monitor -d web dev term social misc dump
 bspc desktop web -l monocle
 bspc desktop dev -l monocle
@@ -28,6 +30,11 @@ bspc rule -a whats-app-nativefier-d52542 desktop=^4
 bspc rule -a TelegramDesktop desktop=^4
 bspc rule -a Nautilus desktop=^5
 bspc rule -a Peek state=floating
+
+# Monitor settings
+xrandr --output DP-1 --mode 2560x1440 --rate 144
+# xrandr --output HDMI-1 --mode 1920x1080 --rotate left --left-of DP-1
+xrandr --output HDMI-1 --off
 
 # Autostart
 ~/.config/bspwm/autostart &

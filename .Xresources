@@ -2,6 +2,7 @@
 ! Xft settings
 !-------------------------------------------------------------------------------
 
+Xft.dpi: 120
 Xft.antialias:              true
 Xft.rgba:                   rgb
 Xft.hinting:                true
@@ -17,8 +18,8 @@ URxvt.depth:                256
 URxvt.internalBorder:       16
 
 ! Fonts
-URxvt*font:                 xft:Roboto Mono:style=Regular:pixelsize=14
-URxvt*boldFont:             xft:Roboto Mono:style=Medium:pixelsize=14
+URxvt*font:                 xft:Roboto Mono:style=Regular:size=11
+URxvt*boldFont:             xft:Roboto Mono:style=Medium:size=11
 
 ! Scrollbar
 URxvt.scrollStyle:          rxvt
@@ -70,7 +71,7 @@ URxvt.matcher.rend.0: Uline Bold fg4
 
 URxvt.keysym.Shift-Control-V: eval:paste_clipboard
 URxvt.keysym.Shift-Control-C: eval:selection_to_clipboard
-URxvt.letterSpace: -1
+URxvt.letterSpace: 0
 
 ! do not scroll with output
 URxvt*scrollTtyOutput: false

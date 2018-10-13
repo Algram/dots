@@ -7,8 +7,10 @@ primary = #667A9F
 alert = #d44956
 
 [bar/default]
+monitor = DP-1
+dpi = 120
 width = 100%
-height = 32
+height = 36
 radius = 0
 fixed-center = true
 
@@ -21,13 +23,13 @@ padding-right = 0
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = Roboto Mono:style=Regular:pixelsize=11;2
-font-1 = RobotoMono Nerd Font:pixelsize=13;3
-font-2 = RobotoMono Nerd Font:pixelsize=9;2
+font-0 = Roboto Mono:style=Regular:size=11;2
+font-1 = RobotoMono Nerd Font:size=13;3
+font-2 = RobotoMono Nerd Font:size=9;2
 
 modules-left = bspwm
 modules-center = date
-modules-right = alsa wlan battery powermenu
+modules-right = player-mpris-simple alsa wlan battery powermenu
 
 # Disable tray manager
 tray-position =
@@ -41,6 +43,14 @@ scroll-down = bspwm-deskprev
 
 cursor-click = pointer
 
+[module/player-mpris-simple]
+type = custom/script
+exec = ~/.config/polybar/player-mpris
+interval = 3
+click-left = playerctl previous
+click-right = playerctl next
+click-middle = playerctl play-pause
+
 [module/xwindow]
 type = internal/xwindow
 label = %title:0:30:...%
@@ -53,6 +63,7 @@ ws-icon-1 = dev;
 ws-icon-2 = term;
 ws-icon-3 = social;
 ws-icon-4 = misc;
+ws-icon-5 = dump;
 
 label-focused = 
 label-focused-underline= ${colors.primary}
@@ -96,8 +107,7 @@ type = internal/alsa
 format-volume-background = #2e343f
 format-volume-padding = 1
 
-format-muted-background = ${colors.alert}
-format-muted-foreground = ${colors.background}
+format-muted-background = #2e343f
 format-muted-padding = 1
 
 format-volume = <ramp-volume> <label-volume>
