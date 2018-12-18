@@ -1,7 +1,7 @@
 #### SXHKD hotkeys ####
 
 # Reload config
-super + Escape
+super + ctrl + Escape
   pkill -USR1 -x sxhkd
 
 # Brightness controls
@@ -143,6 +143,10 @@ super + {o,i}
 # Focus or send to the given desktop
 super + {_,shift + }{1-9,0}
   bspc {desktop -f,node -d} '^{1-9,10}'
+
+# Focus or send to scratchpad
+super + {_,shift} + Escape
+  bspc {desktop -f,node -d} '^6'
 
 # Preselect the direction
 super + ctrl + {h,j,k,l}

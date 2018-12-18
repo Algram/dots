@@ -10,7 +10,10 @@ else
 fi
 
 # Start mpv and record its PID
-mpv --save-position-on-quit "$URL" --quiet > /dev/null &
+PREFIX="x-special/nautilus-clipboard copy "
+URL=${URL//$PREFIX/}
+echo $URL
+mpv --save-position-on-quit "$URL" > /dev/null &
 PID=$!
 
 hidden=false
