@@ -30,6 +30,7 @@ bspc rule -a whats-app-nativefier-d40211 desktop=^4
 bspc rule -a TelegramDesktop desktop=^4
 bspc rule -a Nautilus desktop=^5
 bspc rule -a Peek state=floating
+bspc rule -a notable flag=sticky
 
 # Monitor settings
 xrandr --output DP-1 --mode 2560x1440 --rate 144

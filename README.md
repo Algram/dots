@@ -69,3 +69,4 @@ dots submodule update --init --recursive $HOME/
 - gsimplecal
 - nerdfonts (Roboto Mono)
 - tldr
+- notable

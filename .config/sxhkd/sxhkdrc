@@ -78,6 +78,10 @@ super + shift + s
 
 
 #### BSPWM hotkeys ####
+# Scratchpad
+super + n
+  ~/.config/bspwm/scratchpad
+
 # Dynamic mpv
 super + p
   ~/.config/bspwm/mpv/dynamic-mpv
