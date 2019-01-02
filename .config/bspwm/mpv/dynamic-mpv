@@ -33,7 +33,7 @@ while true; do
         bspc subscribe desktop_focus |
           while read -r line; do
 
-            if [[ $line = *"0x00200007"* ]]; then
+            if [[ $line = *"0x00200008"* ]]; then
               # Save the last hidden state before changing it on workspace 5
               if [[ -n $(bspc query -N -n "$NID".hidden) ]]; then
                 hidden=true

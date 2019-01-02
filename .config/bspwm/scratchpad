@@ -1,9 +1,9 @@
 #!/bin/bash
 
-id=$(xdotool search --class notable | head -n 1)
+CURRENT_DESKTOP=$(bspc query -D -d focused)
 
-if [ "$id" != "" ]; then
-  bspc node "$id" -g sticky=true -g hidden -t floating -f
+if [ "$CURRENT_DESKTOP" == "0x00200008" ]; then
+  bspc desktop -f last
 else
-  bspc rule -a \* -o state=floating sticky=true && notable &
+  bspc desktop -f '^6'
 fi

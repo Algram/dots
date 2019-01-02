@@ -78,9 +78,17 @@ super + shift + s
 
 
 #### BSPWM hotkeys ####
-# Scratchpad
-super + n
+# Focus or send to scratchpad
+super + Escape
   ~/.config/bspwm/scratchpad
+
+# Send to scratchpad
+super + shift + Escape
+  bspc node -d '^6'
+
+# Notes
+super + n
+  ~/.config/bspwm/notes
 
 # Dynamic mpv
 super + p
@@ -147,10 +155,6 @@ super + {o,i}
 # Focus or send to the given desktop
 super + {_,shift + }{1-9,0}
   bspc {desktop -f,node -d} '^{1-9,10}'
-
-# Focus or send to scratchpad
-super + {_,shift} + Escape
-  bspc {desktop -f,node -d} '^6'
 
 # Preselect the direction
 super + ctrl + {h,j,k,l}
