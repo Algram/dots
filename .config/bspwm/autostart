@@ -16,6 +16,7 @@ feh --bg-scale ~/.wallpaper.jpg &
 
 # Start applications
 dropbox start &
+syncthing -no-browser &
 
 firefox &
 

@@ -29,7 +29,7 @@ font-2 = RobotoMono Nerd Font:size=9;2
 
 modules-left = bspwm
 modules-center = date
-modules-right = player-mpris-simple alsa wlan battery powermenu
+modules-right = alsa wlan battery powermenu
 
 # Disable tray manager
 tray-position =
@@ -63,7 +63,6 @@ ws-icon-1 = dev;
 ws-icon-2 = term;
 ws-icon-3 = social;
 ws-icon-4 = misc;
-ws-icon-5 = dump;
 
 label-focused = 
 label-focused-underline= ${colors.primary}

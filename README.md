@@ -70,3 +70,4 @@ dots submodule update --init --recursive $HOME/
 - nerdfonts (Roboto Mono)
 - tldr
 - notable
+- syncthing
