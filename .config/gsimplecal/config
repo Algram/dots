@@ -1,5 +1,5 @@
 mainwindow_position = center
-mainwindow_xoffset = -10
-mainwindow_yoffset = -408
+mainwindow_xoffset = -38
+mainwindow_yoffset = -584
 close_on_unfocus = 1
 mainwindow_keep_above = 0

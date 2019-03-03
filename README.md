@@ -71,3 +71,4 @@ dots submodule update --init --recursive $HOME/
 - tldr
 - notable
 - syncthing
+- fd

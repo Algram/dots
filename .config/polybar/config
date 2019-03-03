@@ -2,7 +2,7 @@
 background = #282C33
 background-alt = #2e343f
 foreground = #eeffff
-foreground-alt = #8ca0aa
+foreground-alt = #8ca0aa 
 primary = #667A9F
 alert = #d44956
 
@@ -58,17 +58,28 @@ label = %title:0:30:...%
 [module/bspwm]
 type = internal/bspwm
 
-ws-icon-0 = web;
-ws-icon-1 = dev;
-ws-icon-2 = term;
-ws-icon-3 = social;
-ws-icon-4 = misc;
+# ws-icon-0 = web;
+# ws-icon-1 = dev;
+# ws-icon-2 = term;
+# ws-icon-3 = social;
+# ws-icon-4 = misc;
+# ws-icon-5 = dump;
 
-label-focused = 
+ws-icon-0 = web;
+ws-icon-1 = dev;
+ws-icon-2 = term;
+ws-icon-3 = social;ﳴ
+ws-icon-4 = misc;
+# ws-icon-5 = dump;
+
+# label-focused = 
+label-focused = %icon%
 label-focused-underline= ${colors.primary}
 label-focused-padding = 2
 label-focused-font = 3
 
+
+label-occupied-foreground = ${colors.primary}
 label-occupied = %icon%
 label-occupied-padding = 2
 label-occupied-font = 3
@@ -79,7 +90,7 @@ label-urgent-padding = 2
 label-urgent-font = 3
 
 label-empty = %icon%
-label-empty-foreground = ${colors.foreground-alt}
+label-empty-foreground = ${colors.primary}
 label-empty-padding = 2
 label-empty-font = 3
 
@@ -90,7 +101,7 @@ interval = 5
 date = " %a %d %b"
 date-alt = ""
 
-time = "   %H:%M"
+time = " %H:%M"
 time-alt = ""
 
 format = %{A:~/.config/polybar/calendar:} <label> %{A}
@@ -98,7 +109,7 @@ format-background = #2e343f
 format-padding = 1
 format-prefix-foreground = ${colors.foreground}
 
-label = %date% %time%
+label = %time%
 
 [module/alsa]
 type = internal/alsa

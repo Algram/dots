@@ -6,8 +6,69 @@ passwordIncorrect=#d44956ff
 background=#00000000
 foreground=#ffffffff
 
-i3lock \
-  -i "$HOME/.config/bspwm/lock.png" \
+# i3lock \
+#   -i "$HOME/.config/bspwm/lock.png" \
+#   --timestr="%H:%M" \
+#   --timepos="x+85:h-70" \
+#   --datepos="x+135:h-45" \
+#   --clock --datestr "Type password to unlock..." \
+#   --insidecolor=$background --ringcolor=$foreground --line-uses-inside \
+#   --keyhlcolor=$letterEnteredColor --bshlcolor=$letterRemovedColor --separatorcolor=$background \
+#   --insidevercolor=$passwordCorrect --insidewrongcolor=$passwordIncorrect \
+#   --ringvercolor=$foreground --ringwrongcolor=$foreground --indpos="x+270:h-68" \
+#   --radius=20 --ring-width=4 --veriftext="" --wrongtext="" --blur 4 \
+#   --verifcolor="$foreground" --timecolor="$foreground" --datecolor="$foreground" \
+#   --noinputtext="" --force-clock $lockargs
+
+# scrot /tmp/screen.png
+# convert /tmp/screen.png -scale 10% -scale 1000% /tmp/screen.png
+# [[ -f /home/user/images/icons/lock-icon.png ]] && convert /tmp/screen.png /home/user/images/icons/lock-icon-1.png -gravity center -composite -matte /tmp/screen.png
+# i3lock -u -i /tmp/screen.png
+
+# ICON=$HOME/.xlock/icon.png
+# TMPBG=/tmp/screen.png
+# scrot /tmp/screen.png
+# convert $TMPBG -scale 10% -scale 1000% $TMPBG
+# convert $TMPBG $ICON -gravity center -composite -matte $TMPBG
+# i3lock -u \
+#   -i $TMPBG \
+#   --timestr="%H:%M" \
+#   --timepos="x+85:h-70" \
+#   --datepos="x+135:h-45" \
+#   --clock --datestr "Type password to unlock..." \
+#   --insidecolor=$background --ringcolor=$foreground --line-uses-inside \
+#   --keyhlcolor=$letterEnteredColor --bshlcolor=$letterRemovedColor --separatorcolor=$background \
+#   --insidevercolor=$passwordCorrect --insidewrongcolor=$passwordIncorrect \
+#   --ringvercolor=$foreground --ringwrongcolor=$foreground --indpos="x+270:h-68" \
+#   --radius=20 --ring-width=4 --veriftext="" --wrongtext="" \
+#   --verifcolor="$foreground" --timecolor="$foreground" --datecolor="$foreground" \
+#   --noinputtext="" --force-clock $lockargs
+
+#!/bin/bash
+# ICON=$HOME/.xlock/icon.png
+TMPBG2=/tmp/screen2.png
+scrot $TMPBG2
+# convert $TMPBG2 -scale 10% -scale 1000% $TMPBG2
+# convert $TMPBG2 $ICON -gravity center -composite -matte $TMPBG2
+ICON=/tmp/xkcd #might be png or jpg, identify from imagemagick will know
+TMPBG=/tmp/screen.png
+
+PIXELATE="-scale 5% -sample 2000%"
+BLUR="-scale 5% -resize 2000%"
+FILTER=$BLUR
+
+LOCK=$HOME/.config/bspwm/lock.png
+RES=$(xrandr | grep 'current' | sed -E 's/.*current\s([0-9]+)\sx\s([0-9]+).*/\1x\2/')
+ 
+function main {
+	if [[ ! -e $ICON ]]; then
+		download_xkcd &
+	fi
+	getScreenshot &
+	wait
+	embedComic
+	i3lock -u \
+  -i $TMPBG \
   --timestr="%H:%M" \
   --timepos="x+85:h-70" \
   --datepos="x+135:h-45" \
@@ -16,6 +77,54 @@ i3lock \
   --keyhlcolor=$letterEnteredColor --bshlcolor=$letterRemovedColor --separatorcolor=$background \
   --insidevercolor=$passwordCorrect --insidewrongcolor=$passwordIncorrect \
   --ringvercolor=$foreground --ringwrongcolor=$foreground --indpos="x+270:h-68" \
-  --radius=20 --ring-width=4 --veriftext="" --wrongtext="" --blur 4 \
+  --radius=20 --ring-width=4 --veriftext="" --wrongtext="" \
   --verifcolor="$foreground" --timecolor="$foreground" --datecolor="$foreground" \
-  --noinputtext="" --force-clock $lockargs
+  --noinputtext="" --force-clock $lockargs &
+	download_xkcd &
+	wait
+	cleanup
+}
+
+function download_xkcd {
+	local NUMCOMICS=$(curl -sL "http://xkcd.com/info.0.json" | grep -oP '(?<=num": )([^,]*)')
+	local COMIC=404
+	until [[ "$COMIC" -ne "404" ]]; do
+		COMIC=$((1 + RANDOM % $NUMCOMICS))
+	done
+	local URL=$(curl -sL "http://xkcd.com/$COMIC/info.0.json" | grep -oP '(?<=img": ")([^"]*)' | tr -d '\\')
+	curl -sL "$URL" -o $ICON
+}
+
+function getScreenshot {
+	scrot $TMPBG;
+  convert $TMPBG $FILTER $TMPBG     #scrot is faster
+}
+
+function embedComic {
+	#lockscreen image info
+	local C_C=($(identify -format "%w %h" $ICON))
+	local SCREENS=$(xrandr --query | grep ' connected' | grep -o '[0-9][0-9]*x[0-9][0-9]*[^ ]*')
+	if [[ -f "$ICON" ]]; then
+		local COMM=""
+		for RES in $SCREENS; do
+			# monitor position/offset
+			local C_S=(${RES//[x+]/ })
+			local PX=$((${C_S[2]} + ${C_S[0]} / 2 - ${C_C[0]} / 2))
+			local PY=$((${C_S[3]} + ${C_S[1]} / 2 - ${C_C[1]} / 2))
+			if [[ "$COMM" == "" ]]; then
+				COMM="convert $TMPBG \( $ICON -repage +$PX+$PY \) "
+			else
+				COMM="${COMM}\( +clone -repage +$PX+$PY \) " #avoid extra file reads
+			fi
+		done
+		COMM="${COMM}-layers flatten $TMPBG"
+		eval $COMM
+	fi
+}
+
+function cleanup {
+	rm $TMPBG
+	#rm $ICON
+}
+
+main "$@"

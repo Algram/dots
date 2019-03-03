@@ -28,5 +28,5 @@ urxvt256c &
 urxvt256c &
 
 signal-desktop &
-Discord &
+flatpak run com.discordapp.Discord &
 ~/.electron-apps/whats-app/whats-app &
