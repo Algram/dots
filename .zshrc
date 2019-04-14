@@ -5,7 +5,7 @@ export ZSH=~/.oh-my-zsh
 ZSH_THEME="spaceship"
 
 # Plugins
-plugins=(git zsh-autosuggestions)
+plugins=(git zsh-autosuggestions z)
 
 # User configuration
 source $ZSH/oh-my-zsh.sh
@@ -13,16 +13,18 @@ source $ZSH/oh-my-zsh.sh
 alias upgrade='sudo dnf upgrade --refresh'
 alias cat='bat'
 alias tldr='tldr --theme ocean'
+alias dots='git --git-dir=$HOME/.dots/ --work-tree=$HOME'
 
+# Quality of life
 alias h='cd --'
 alias r='cd /'
-alias d='cd ~/dev'
 alias ..='cd ..'
 alias ...='cd ../../../'
 alias ....='cd ../../../../'
 alias .....='cd ../../../../'
 
-alias dots='git --git-dir=$HOME/.dots/ --work-tree=$HOME'
+alias dc='docker-compose'
+alias config='vim ~/.zshrc'
 
 # Go exports
 export GOPATH=$HOME/dev/golang

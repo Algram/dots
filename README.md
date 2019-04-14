@@ -44,7 +44,7 @@ dots submodule update --init --recursive $HOME/
 - bspwm
 - sxhkd
 - polybar
-- compton
+- compton (https://github.com/yshui/compton)
 - dunst, dunstify
 - rofi
 - rofi-plugin-calc

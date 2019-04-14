@@ -2,7 +2,7 @@
 
 # Start services
 sxhkd &
-compton -b --config ~/.config/compton.conf &
+/usr/local/bin/compton -b --config ~/.config/compton.conf --experimental-backends &
 polybar default &
 ~/.config/rofi/clipmenu/clipmenud &
 redshift -t 5200:3200 -l 52.5200:13.405 &
