@@ -1,5 +1,10 @@
+<h1 align="center">
+  ⚙️ Dots
+</h1>
 
-# Dots
+<p align="center">
+  configs, scripts, quality of life
+</p>
 
 ## Setup
 The dotfiles setup is based on the concept from [jaagr](https://github.com/jaagr/dots). Basically everything is managed with a git repository and the `dots` alias.
