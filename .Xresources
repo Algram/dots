@@ -2,7 +2,7 @@
 ! Xft settings
 !-------------------------------------------------------------------------------
 
-Xft.dpi:                    120
+Xft.dpi:                    110
 Xft.antialias:              true
 Xft.rgba:                   rgb
 Xft.hinting:                true
@@ -81,3 +81,7 @@ URxvt*scrollWithBuffer: true
 
 ! scroll back to the bottom on keypress
 URxvt*scrollTtyKeypress: true
+
+! disable icon insertion
+URxvt*iso14755: false
+URxvt*iso14755_52: false

@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+
+import argparse
+from subprocess import Popen, PIPE
+
+# Function to check that a value is a positive int
+#   returns: Int
+def positive_int(value):
+    output = int(value)
+    if output <= 0:
+        raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+    return output
+
+# Set up the arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("vertical", choices=['top', 'middle', 'bottom'], help="the location of the window vertically")
+parser.add_argument("horizontal", choices=['left', 'middle', 'right'], help="the location of the window horizontally")
+parser.add_argument("-s", "--scale", help="window scale relative to monitor size", default=5, type=positive_int)
+parser.add_argument("-b", "--border", help="border size to include in window positioning calculations", default=0, type=int)
+args = parser.parse_args()
+
+# Function to get the resolution of the currently focused monitor
+#    returns: List ([x, y])
+def get_screen_resolution():
+    resolution = Popen(['xdotool', 'getdisplaygeometry'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    output, err = resolution.communicate()
+
+    return list(map(int, output.decode("utf-8").split()))
+
+# Function to get the new size of the target window
+#   returns: List ([x, y])
+def get_window_size():
+    output = get_screen_resolution()
+    output[0] = int(output[0] / args.scale)
+    output[1] = int(output[1] / args.scale)
+
+    return output
+
+# Function to get the new x and y position of the target window
+#   returns: List ([x, y])
+def get_window_position():
+    screen_resolution = get_screen_resolution()
+    window_size = get_window_size()
+
+    x_pos = args.border
+    y_pos = args.border
+
+    # Calculate the x position
+    if args.horizontal == 'right':
+        x_pos = int(screen_resolution[0] - window_size[0] - args.border)
+    elif args.horizontal == 'middle':
+        x_pos = int((screen_resolution[0] / 2) - (window_size[0] / 2))
+
+    # Calculate the y position
+    if args.vertical == 'bottom':
+        y_pos = int(screen_resolution[1] - window_size[1] - args.border)
+    elif args.vertical == 'middle':
+        y_pos = int((screen_resolution[1] / 2) - (window_size[1] / 2))
+
+    output = [x_pos, y_pos]
+
+    return output
+
+# Function to get the identifier of the current focused window
+#   returns: Int 
+def get_window_id():
+    window = Popen(['xdotool', 'getwindowfocus'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    output, err = window.communicate()
+
+    return output.decode("utf-8")
+
+# Function to set the currently focused window to the correct size
+#   returns: None
+def set_window_size():
+    Popen(['xdotool', 'windowsize', str(get_window_id()), str(get_window_size()[0]), str(get_window_size()[1])], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+
+# Function to move the currently focused (and resized) window to the correct position
+#   returns: None
+def set_window_position():
+    Popen(['xdotool', 'windowmove', str(get_window_id()), str(get_window_position()[0]), str(get_window_position()[1])], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+
+set_window_size()
+set_window_position()
+

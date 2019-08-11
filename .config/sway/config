@@ -1,0 +1,251 @@
+# Default config for sway
+#
+# Copy this to ~/.config/sway/config and edit it to your liking.
+#
+# Read `man 5 sway` for a complete reference.
+
+# Variables
+set $alt Mod1
+set $mod Mod4
+set $left h
+set $down j
+set $up k
+set $right l
+set $term urxvt256c-ml
+
+# Global settings
+focus_follows_mouse no
+default_border none
+default_floating_border none
+smart_borders on
+gaps inner 12
+smart_gaps on
+workspace_auto_back_and_forth yes
+exec gsettings set org.gnome.desktop.interface gtk-theme "Materia-light-compact"
+exec gsettings set org.gnome.desktop.interface icon-theme "Numix-Circle"
+
+# Application settings
+assign [class="Firefox"] 1: web
+assign [class="Code"] 2: dev
+assign [class="URxvt"] 3: term
+assign [class="Signal"] 4: social
+assign [class="whats-app-nativefier-d52542"] 4: social
+assign [class="discord"] 4: social
+for_window [class="Notable"] move scratchpad; scratchpad show
+
+# Autostart
+exec xrdb -load ~/.Xresources
+exec clipman -d
+exec mako \
+  --layer overlay
+exec ~/.config/rofi/clipmenu/clipmenud
+exec redshift -t 5200:3200 -l 52.5200:13.405
+exec dropbox start
+exec syncthing -no-browser
+
+exec firefox
+exec code
+exec $term
+exec $term
+exec $term
+exec $term
+exec signal-desktop
+exec flatpak run com.discordapp.Discord
+exec ~/.electron-apps/whats-app/whats-app
+exec /opt/Notable/notable
+
+# Audio controls
+bindsym XF86AudioLowerVolume exec ~/.config/sway/tools/volume down
+bindsym XF86AudioRaiseVolume exec ~/.config/sway/tools/volume up
+bindsym XF86AudioMute exec ~/.config/sway/tools/volume mute
+
+# Screenshots
+bindsym $mod+Shift+i exec ~/.config/sway/tools/screenshot area
+bindsym $mod+Shift+p exec ~/.config/sway/tools/screenshot color
+bindsym $mod+p exec ~/.config/sway/tools/mpv/dynamic-mpv
+
+### Output configuration
+#
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+output * bg ~/.wallpaper.jpg fill
+#
+# Example configuration:
+#
+output DP-1 mode 2560x1440@143.998001Hz
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+### Input configuration
+#
+# Example configuration:
+#
+input "5426:67:Razer_Razer_DeathAdder_Chroma" {
+    dwt enabled
+    tap enabled
+    accel_profile flat
+    middle_emulation enabled
+    pointer_accel 0
+}
+#
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Read `man 5 sway-input` for more information about this section.
+
+### Key bindings
+#
+# Basics:
+#
+    # start a terminal
+    bindsym $mod+Return exec $term
+
+    # kill focused window
+    bindsym $mod+w kill
+
+    # start your launcher
+    bindsym $mod+space exec ~/.config/sway/tools/launcher default
+    bindsym $alt+space exec ~/.config/sway/tools/launcher gopass
+    bindsym ctrl+space exec ~/.config/sway/tools/launcher clipman
+
+    # Umlauts
+    bindsym $mod+a exec ~/.config/sway/tools/key "a" "ä"
+    bindsym $mod+Shift+a exec ~/.config/sway/tools/key "a" "Ä"
+    bindsym $mod+o exec ~/.config/sway/tools/key "o" "ö"
+    bindsym $mod+Shift+o exec ~/.config/sway/tools/key "o" "Ö"
+    bindsym $mod+u exec ~/.config/sway/tools/key "u" "ü"
+    bindsym $mod+Shift+u exec ~/.config/sway/tools/key "u" "Ü"
+    bindsym $mod+s exec ~/.config/sway/tools/key "s" "ß"
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    # exit sway (logs you out of your wayland session)
+    bindsym $mod+Shift+e exit
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    # or use $mod+[up|down|left|right]
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # _move_ the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+    # ditto, with arrow keys
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+#
+# Workspaces:
+#
+    # switch to workspace
+    bindsym $mod+1 workspace 1: web
+    bindsym $mod+2 workspace 2: dev
+    bindsym $mod+3 workspace 3: term
+    bindsym $mod+4 workspace 4: social
+    bindsym $mod+5 workspace 5: misc
+    bindsym $mod+6 workspace 6
+    bindsym $mod+7 workspace 7
+    bindsym $mod+8 workspace 8
+    bindsym $mod+9 workspace 9
+    bindsym $mod+0 workspace 10
+    bindsym $mod+Escape workspace 999: media
+    # move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace 1: web
+    bindsym $mod+Shift+2 move container to workspace 2: dev
+    bindsym $mod+Shift+3 move container to workspace 3: term
+    bindsym $mod+Shift+4 move container to workspace 4: social
+    bindsym $mod+Shift+5 move container to workspace 5: misc
+    bindsym $mod+Shift+6 move container to workspace 6
+    bindsym $mod+Shift+7 move container to workspace 7
+    bindsym $mod+Shift+8 move container to workspace 8
+    bindsym $mod+Shift+9 move container to workspace 9
+    bindsym $mod+Shift+0 move container to workspace 10
+    bindsym $mod+Shift+Escape move container to workspace 999: media
+    # Note: workspaces can have any name you want, not just numbers.
+    # We just use 1-10 as the default.
+#
+# Layout stuff:
+#
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+
+    # Switch the current container between different layout styles
+    # bindsym $mod+m layout stacking
+    # bindsym $mod+w layout tabbed
+    bindsym $mod+c layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+f floating toggle
+
+    # Swap focus between the tiling area and the floating area
+    # bindsym $mod+space focus mode_toggle
+
+    # move focus to the parent container
+    # bindsym $mod+a focus parent
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+n move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+n scratchpad show
+#
+# Resizing containers:
+#
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left resize shrink width 10 px or 10 ppt
+    bindsym $down resize grow height 10 px or 10 ppt
+    bindsym $up resize shrink height 10 px or 10 ppt
+    bindsym $right resize grow width 10 px or 10 ppt
+
+    # ditto, with arrow keys
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+
+    # return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+# bindsym $mod+r mode "resize"
+
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+bar {
+    swaybar_command waybar
+}
+
+include /etc/sway/config.d/*

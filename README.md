@@ -45,6 +45,15 @@ rm -r /tmp/dots
 dots submodule update --init --recursive $HOME/
 ```
 
+## Applications (Sway)
+- mako (Notifications)
+- slurp
+- grim
+- wl-clipboard
+- waybar
+- https://github.com/yory8/clipman
+- https://github.com/vlevit/notify-send.sh
+
 ## Applications
 - bspwm
 - sxhkd

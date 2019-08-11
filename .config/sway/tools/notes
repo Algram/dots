@@ -1,0 +1,9 @@
+#!/bin/bash
+
+id=$(xdotool search --class notable | head -n 1)
+
+if [ "$id" != "" ]; then
+  bspc node "$id" -g sticky=true -g hidden -t floating -f
+else
+  bspc rule -a \* -o state=floating sticky=true && notable &
+fi
