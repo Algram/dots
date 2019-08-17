@@ -1,18 +1,21 @@
+@import url("/home/raphaelg/.cache/wal/colors-waybar.css");
+
 * {
   border: none;
   border-radius: 0;
   font-family: "Roboto Mono", Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   min-height: 0;
-  
+  margin: 2px;
+  font-weight: normal;
 }
 
 window#waybar {
-  background-color: rgba(43, 48, 59, 0.5);
+  background-color: @background;
   /* border-bottom: 3px solid rgba(100, 114, 125, 0.5); */
-  color: #ffffff;
+  color: @foreground;
   transition-property: background-color;
-  transition-duration: .5s;
+  transition-duration: 0.5s;
 }
 
 window#waybar.hidden {
@@ -28,8 +31,10 @@ window#waybar.solo {
 }
 */
 
-window#waybar.termite {
-  background-color: #3F3F3F;
+/* Media button */
+window#waybar button:nth-child(6) {
+  background-color: @color3;
+  color: @background;
 }
 
 window#waybar.chromium {
@@ -39,8 +44,9 @@ window#waybar.chromium {
 
 #workspaces button {
   padding: 0 8px 0 0;
+  border-radius: 4px;
   background-color: transparent;
-  color: #ffffff;
+  color: @foreground;
   /* border-bottom: 3px solid transparent; */
 }
 
@@ -52,13 +58,13 @@ window#waybar.chromium {
 }
 
 #workspaces button.focused {
-  background-color: #64727D;
-  font-weight: bold;
+  background-color: @color0;
+  /* font-weight: bold; */
   /* border-bottom: 3px solid #ffffff; */
 }
 
 #workspaces button.urgent {
-  background-color: #eb4d4b;
+  background-color: @color9;
 }
 
 /* #clock {
@@ -68,12 +74,11 @@ window#waybar.chromium {
 #custom-power {
   /* background-color: #0ca3a8;
   color: #305f61; */
-  min-width: 64px;
+  min-width: 42px;
 }
 
-
 #mode {
-  background-color: #64727D;
+  background-color: #64727d;
   /* border-bottom: 3px solid #ffffff; */
 }
 
@@ -101,13 +106,13 @@ window#waybar.chromium {
 
 #battery.charging {
   color: #ffffff;
-  background-color: #26A65B;
+  background-color: #26a65b;
 }
 
 @keyframes blink {
   to {
-      background-color: #ffffff;
-      color: #000000;
+    background-color: #ffffff;
+    color: #000000;
   }
 }
 

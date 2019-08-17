@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Utility for volume control and a notification popup with dunst.
+# Utility for volume control and a notification popup with mako.
 # 
 # Examples:
 # ./volume up       -->			Increase volume by 7
@@ -54,8 +54,7 @@ function send_notification {
     bar="奄"
   fi
 
-  # Send the volume indicator notification with dunst
-  # ~/.config/dunst/dunstify -t 1000 -r 1001 -u low "$bar"
+  # Send the volume indicator notification with mako
   ~/.config/sway/external/notify-send.sh -t 1000 --replace-file=/tmp/sound-notification --hint=int:value:$volume "$bar $volume"
 }
 
@@ -82,8 +81,7 @@ case $1 in
     amixer -D pulse set Master 1+ toggle > /dev/null
 
     if is_mute; then
-      # ~/.config/dunst/dunstify -t 1000 -r 1001 -u low "婢  Mute"
-      ~/.config/sway/external/notify-send.sh -t 1000 --replace-file=/tmp/sound-notification "婢  Mute"
+      ~/.config/sway/external/notify-send.sh -t 1000 --replace-file=/tmp/sound-notification "婢 Mute"
     else
       # Play the freedesktop volume change sound
       play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &

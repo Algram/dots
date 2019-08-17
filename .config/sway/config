@@ -4,6 +4,8 @@
 #
 # Read `man 5 sway` for a complete reference.
 
+include "$HOME/.cache/wal/colors-sway"
+
 # Variables
 set $alt Mod1
 set $mod Mod4
@@ -24,35 +26,38 @@ workspace_auto_back_and_forth yes
 exec gsettings set org.gnome.desktop.interface gtk-theme "Materia-light-compact"
 exec gsettings set org.gnome.desktop.interface icon-theme "Numix-Circle"
 
+# Titlebar settings
+# title_format "<b>%title</b>"
+title_align center
+titlebar_border_thickness 0
+titlebar_padding 8
+hide_edge_borders --i3 smart_no_gaps
+font "Roboto Mono 11"
+client.unfocused $color8 $color8 $foreground $color0 $color8
+client.focused $color0 $color0 $foreground $color0 $color0
+
 # Application settings
 assign [class="Firefox"] 1: web
-assign [class="Code"] 2: dev
+assign [class="code"] 2: dev
 assign [class="URxvt"] 3: term
 assign [class="Signal"] 4: social
 assign [class="whats-app-nativefier-d52542"] 4: social
 assign [class="discord"] 4: social
-for_window [class="Notable"] move scratchpad; scratchpad show
+
+for_window [app_id="ncmpcpp"] floating enable
+for_window [class="Notable"] move scratchpad
+for_window [title=".*\(Private Browsing\).*"] move to workspace 999: media
 
 # Autostart
-exec xrdb -load ~/.Xresources
-exec clipman -d
-exec mako \
-  --layer overlay
-exec ~/.config/rofi/clipmenu/clipmenud
-exec redshift -t 5200:3200 -l 52.5200:13.405
+exec xrdb ~/.Xresources
+exec wal --theme ~/.config/sway/tools/colors.json
+exec ~/dev/golang/bin/clipman -d
+exec_always ~/.config/sway/tools/notifications
+exec redshift -t 5200:3200 -l 52.5200:13.405 -m wayland
 exec dropbox start
 exec syncthing -no-browser
 
-exec firefox
-exec code
-exec $term
-exec $term
-exec $term
-exec $term
-exec signal-desktop
-exec flatpak run com.discordapp.Discord
-exec ~/.electron-apps/whats-app/whats-app
-exec /opt/Notable/notable
+exec ~/.config/sway/autostart
 
 # Audio controls
 bindsym XF86AudioLowerVolume exec ~/.config/sway/tools/volume down
@@ -61,6 +66,7 @@ bindsym XF86AudioMute exec ~/.config/sway/tools/volume mute
 
 # Screenshots
 bindsym $mod+Shift+i exec ~/.config/sway/tools/screenshot area
+bindsym $mod+Shift+w exec ~/.config/sway/tools/screenshot window
 bindsym $mod+Shift+p exec ~/.config/sway/tools/screenshot color
 bindsym $mod+p exec ~/.config/sway/tools/mpv/dynamic-mpv
 
@@ -99,10 +105,14 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     # kill focused window
     bindsym $mod+w kill
 
+    # Lock the screen
+    bindsym $mod+l exec ~/.config/sway/tools/lock
+
     # start your launcher
     bindsym $mod+space exec ~/.config/sway/tools/launcher default
     bindsym $alt+space exec ~/.config/sway/tools/launcher gopass
     bindsym ctrl+space exec ~/.config/sway/tools/launcher clipman
+    bindsym ctrl+e+space exec ~/.config/sway/tools/launcher emoji
 
     # Umlauts
     bindsym $mod+a exec ~/.config/sway/tools/key "a" "ä"
@@ -120,8 +130,8 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     # mouse button for dragging.
     floating_modifier $mod normal
 
-    # reload the configuration file
-    bindsym $mod+Shift+c reload
+    # Reload the configuration file and the wal color file
+    bindsym $mod+Shift+c reload; ~/.local/bin/wal --theme ~/.config/sway/tools/colors.json
 
     # exit sway (logs you out of your wayland session)
     bindsym $mod+Shift+e exit
@@ -129,10 +139,10 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
 # Moving around:
 #
     # Move your focus around
-    bindsym $mod+$left focus left
-    bindsym $mod+$down focus down
-    bindsym $mod+$up focus up
-    bindsym $mod+$right focus right
+    # bindsym $mod+$left focus left
+    # bindsym $mod+$down focus down
+    # bindsym $mod+$up focus up
+    # bindsym $mod+$right focus right
     # or use $mod+[up|down|left|right]
     bindsym $mod+Left focus left
     bindsym $mod+Down focus down
@@ -158,11 +168,7 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     bindsym $mod+3 workspace 3: term
     bindsym $mod+4 workspace 4: social
     bindsym $mod+5 workspace 5: misc
-    bindsym $mod+6 workspace 6
-    bindsym $mod+7 workspace 7
-    bindsym $mod+8 workspace 8
-    bindsym $mod+9 workspace 9
-    bindsym $mod+0 workspace 10
+    bindsym $mod+6 workspace 6: temp
     bindsym $mod+Escape workspace 999: media
     # move focused container to workspace
     bindsym $mod+Shift+1 move container to workspace 1: web
@@ -170,11 +176,7 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     bindsym $mod+Shift+3 move container to workspace 3: term
     bindsym $mod+Shift+4 move container to workspace 4: social
     bindsym $mod+Shift+5 move container to workspace 5: misc
-    bindsym $mod+Shift+6 move container to workspace 6
-    bindsym $mod+Shift+7 move container to workspace 7
-    bindsym $mod+Shift+8 move container to workspace 8
-    bindsym $mod+Shift+9 move container to workspace 9
-    bindsym $mod+Shift+0 move container to workspace 10
+    bindsym $mod+Shift+6 move container to workspace 6: temp
     bindsym $mod+Shift+Escape move container to workspace 999: media
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
@@ -190,6 +192,7 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     # Switch the current container between different layout styles
     # bindsym $mod+m layout stacking
     # bindsym $mod+w layout tabbed
+    bindsym $mod+m layout toggle tabbed split
     bindsym $mod+c layout toggle split
 
     # Make the current focus fullscreen

@@ -35,3 +35,5 @@ export PATH=${PATH}:${HOME}/.cargo/bin
 
 # Fix autosuggest highlight color on urxvt
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=15"
+
+export PATH="${PATH}:${HOME}/.local/bin/"

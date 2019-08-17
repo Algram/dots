@@ -11,6 +11,8 @@ if [ $1 == "clipman" ]; then
   ~/dev/golang/bin/clipman -s --max-items 8 --selector "rofi"
 elif [ $1 == "gopass" ]; then
   ~/dev/golang/bin/gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/dev/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
+elif [ $1 == "emoji" ]; then
+  rofi -show emoji -modi emoji
 else
   rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort -show-icons
 fi

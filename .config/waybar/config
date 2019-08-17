@@ -1,13 +1,12 @@
 {
     "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 32, // Waybar height (to be removed for auto height)
+    // "height": 32, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     // Choose the order of the modules
     "modules-left": ["sway/workspaces", "sway/mode"],
     "modules-center": ["clock"],
     "modules-right": ["custom/power"],
-    // "margin": 8,
     // Modules configuration
     "sway/workspaces": {
         "disable-scroll": true,
@@ -73,9 +72,9 @@
         "spacing": 10
     },
     "clock": {
-        "format": "{:%d-%m-%Y | %H:%M}",
-        "tooltip-format": "{:%Y-%m-%d | %H:%M}",
-        "format-alt": "{:%Y-%m-%d}"
+        "format": " {:%d.%m.%Y |  %H:%M}"
+        // "tooltip-format": "{:%Y-%m-%d | %H:%M}",
+        // "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {
         "format": "{usage}% ",
@@ -152,5 +151,6 @@
         "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
-    "custom/power":{ "format":"", "on-click":"swaynag -t warning -m 'Power Menu Options' -b 'Logout' 'swaymsg exit' -b 'Suspend' 'systemctl suspend' -b 'shutdown' 'systemctl shutdown'" }
+    //"custom/power":{ "format":"", "on-click":"swaynag -t warning -m 'Power Menu Options' -b 'Logout' 'swaymsg exit' -b 'Suspend' 'systemctl suspend' -b 'shutdown' 'systemctl shutdown'" }
+    "custom/power":{ "format":"", "on-click":"systemctl suspend" }
 }

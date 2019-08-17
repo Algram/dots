@@ -45,6 +45,11 @@ rm -r /tmp/dots
 dots submodule update --init --recursive $HOME/
 ```
 
+## Wallpaper
+- https://unsplash.com/photos/Z4wF0h47fy8
+- https://unsplash.com/photos/VNseEaTt9w4
+- https://unsplash.com/photos/JgOeRuGD_Y4
+
 ## Applications (Sway)
 - mako (Notifications)
 - slurp
@@ -53,6 +58,8 @@ dots submodule update --init --recursive $HOME/
 - waybar
 - https://github.com/yory8/clipman
 - https://github.com/vlevit/notify-send.sh
+- https://github.com/Bluedrack28/vscode-wal
+- pywal
 
 ## Applications
 - bspwm

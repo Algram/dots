@@ -12,24 +12,24 @@ fi
 # Start mpv and record its PID
 PREFIX="x-special/nautilus-clipboard copy "
 URL=${URL//$PREFIX/}
-echo $URL
 mpv --save-position-on-quit "$URL" > /dev/null &
 PID=$!
 
-configured=false
+sway for_window [class="mpv"] sticky enable
+sway for_window [class="mpv"] floating enable
+sway for_window [class="mpv"] resize set 700px 394px
+sway for_window [class="mpv"] move position 1848px 1002px
 
 # Start an infinite while loop to run while mpv is still running
 while true; do
   sleep 0.2
   if kill -0 $PID; then # check mpv is still running
     if xdotool search --pid $PID; then # check when mpv has an open window
-      if ! $configured; then
-        configured=true
-        sleep 1
-        sway [class="mpv"] sticky enable 
-        sway [class="mpv"] floating enable
-        sway [class="mpv"] resize set 700px 400px
-        sway [class="mpv"] move position 1848px 1024px
+      # Check if media workspace is currently visible
+      if [[ $(swaymsg -t get_workspaces | jq '.[] | select(.visible==true and .name=="999: media")') ]]; then
+        sway [class="mpv"] fullscreen enable
+      else
+        sway [class="mpv"] fullscreen disable
       fi
     #   if xdotool windowfocus $(xdotool search --pid $PID); then # focus the open window and run several tasks
     #     NID=$(xdotool search --pid $PID)
