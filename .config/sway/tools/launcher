@@ -8,7 +8,7 @@
 # ./launcher gopass     -->			Show a rofi launcher in dmenu mode with gopass piped into it
 
 if [ $1 == "clipman" ]; then
-  ~/dev/golang/bin/clipman -s --max-items 8 --selector "rofi"
+  ~/dev/golang/bin/clipman pick --histpath="~/.local/share/clipman-primary.json" --tool "rofi" --tool-args="-l 8"
 elif [ $1 == "gopass" ]; then
   ~/dev/golang/bin/gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/dev/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
 elif [ $1 == "emoji" ]; then

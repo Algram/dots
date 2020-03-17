@@ -3,6 +3,7 @@
 sleep 0.5
 
 firefox &
+firefox -private-window &
 code &
 urxvt256c-ml &
 urxvt256c-ml &

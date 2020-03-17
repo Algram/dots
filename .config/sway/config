@@ -6,6 +6,11 @@
 
 include "$HOME/.cache/wal/colors-sway"
 
+# input type:keyboard xkb_layout us-de-umlaut
+
+input type:pointer accel_profile flat
+input type:pointer pointer_accel 0
+
 # Variables
 set $alt Mod1
 set $mod Mod4
@@ -17,7 +22,7 @@ set $term urxvt256c-ml
 
 # Global settings
 focus_follows_mouse no
-default_border none
+default_border pixel
 default_floating_border none
 smart_borders on
 gaps inner 12
@@ -34,28 +39,33 @@ titlebar_padding 8
 hide_edge_borders --i3 smart_no_gaps
 font "Roboto Mono 11"
 client.unfocused $color8 $color8 $foreground $color0 $color8
-client.focused $color0 $color0 $foreground $color0 $color0
+client.focused_inactive $color8 $color8 $foreground $color0 $color8
+client.focused $color0 $color15 $foreground $color0 $color15
 
 # Application settings
 assign [class="Firefox"] 1: web
-assign [class="code"] 2: dev
+assign [class="Code"] 2: dev
 assign [class="URxvt"] 3: term
 assign [class="Signal"] 4: social
 assign [class="whats-app-nativefier-d52542"] 4: social
 assign [class="discord"] 4: social
 
 for_window [app_id="ncmpcpp"] floating enable
+for_window [app_id="mpv"] border none
+for_window [app_id="mpv"] floating enable
+for_window [app_id="mpv"] sticky enable
 for_window [class="Notable"] move scratchpad
 for_window [title=".*\(Private Browsing\).*"] move to workspace 999: media
 
 # Autostart
 exec xrdb ~/.Xresources
 exec wal --theme ~/.config/sway/tools/colors.json
-exec ~/dev/golang/bin/clipman -d
 exec_always ~/.config/sway/tools/notifications
 exec redshift -t 5200:3200 -l 52.5200:13.405 -m wayland
 exec dropbox start
 exec syncthing -no-browser
+# exec_always wl-paste -t text --watch ~/dev/golang/bin/clipman store
+# exec_always wl-paste -p -t text --watch ~/dev/golang/bin/clipman store --histpath="~/.local/share/clipman-primary.json"
 
 exec ~/.config/sway/autostart
 
@@ -77,7 +87,8 @@ output * bg ~/.wallpaper.jpg fill
 #
 # Example configuration:
 #
-output DP-1 mode 2560x1440@143.998001Hz
+# output DP-1 mode 2560x1440@143.998001Hz
+output DP-1 mode 2560x1440@143.912003Hz
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Input configuration
@@ -189,6 +200,8 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     bindsym $mod+b splith
     bindsym $mod+v splitv
 
+    bindsym $mod+Shift+s sticky toggle
+
     # Switch the current container between different layout styles
     # bindsym $mod+m layout stacking
     # bindsym $mod+w layout tabbed
@@ -207,7 +220,7 @@ input "5426:67:Razer_Razer_DeathAdder_Chroma" {
     # move focus to the parent container
     # bindsym $mod+a focus parent
 #
-# Scratchpad:
+# Scratchpad: 0 038712114040
 #
     # Sway has a "scratchpad", which is a bag of holding for windows.
     # You can send windows there and get them back later.
