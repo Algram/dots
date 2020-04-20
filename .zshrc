@@ -33,5 +33,9 @@ export PATH=${PATH}:${GOPATH}/bin
 # Rust exports
 export PATH=${PATH}:${HOME}/.cargo/bin
 
+export PATH=${PATH}:${HOME}/Downloads/sdcc-9948_mcs51/bin
+
 # Fix autosuggest highlight color on urxvt
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=15"
+
+export PATH="${PATH}:${HOME}/.local/bin/"

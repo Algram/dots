@@ -1,0 +1,22 @@
+#!/bin/bash
+
+. "/home/raphaelg/.cache/wal/colors.sh"
+
+pkill mako
+
+mako \
+--layer overlay \
+--anchor top-center \
+--default-timeout 3000 \
+--border-size 0 \
+--border-radius 8 \
+--font="RobotoMono 16px" \
+--icons 1 \
+--icon-path /usr/share/icons/Numix-Circle/48/apps/ \
+--width 360 \
+--padding 12 \
+--margin 24 \
+--background-color $color8 \
+--text-color $foreground \
+--progress-color $color0 \
+--border-color $color0

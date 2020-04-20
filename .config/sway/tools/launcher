@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Utility for starting different launchers
+# 
+# Examples:
+# ./launcher default    -->			Show the default rofi launcher in drun mode
+# ./launcher clipman   -->			Show a rofi launcher in dmenu mode with clipman piped into it
+# ./launcher gopass     -->			Show a rofi launcher in dmenu mode with gopass piped into it
+
+if [ $1 == "clipman" ]; then
+  ~/dev/golang/bin/clipman pick --histpath="~/.local/share/clipman-primary.json" --tool "rofi" --tool-args="-l 8"
+elif [ $1 == "gopass" ]; then
+  ~/dev/golang/bin/gopass ls --flat | rofi -dmenu -p gopass | xargs --no-run-if-empty ~/dev/golang/bin/gopass show -f | head -n 1 | xdotool type --clearmodifiers --file -
+elif [ $1 == "emoji" ]; then
+  rofi -show emoji -modi emoji
+else
+  rofi -plugin-path /usr/local/lib/rofi -show drun -no-show-match -no-sort -show-icons
+fi

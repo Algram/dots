@@ -1,8 +1,10 @@
+#include "/home/raphaelg/.cache/wal/colors.Xresources"
+
 !-------------------------------------------------------------------------------
 ! Xft settings
 !-------------------------------------------------------------------------------
 
-Xft.dpi:                    120
+Xft.dpi:                    106
 Xft.antialias:              true
 Xft.rgba:                   rgb
 Xft.hinting:                true
@@ -13,54 +15,18 @@ Xft.hintstyle:              hintslight
 !-------------------------------------------------------------------------------
 
 URxvt.depth:                256
+URxvt*buffered:             false
 
 ! Padding
 URxvt.internalBorder:       16
 
 ! Fonts
-URxvt*font:                 xft:Roboto Mono:style=Regular:size=11
-URxvt*boldFont:             xft:Roboto Mono:style=Medium:size=11
+URxvt*font:                 xft:Roboto Mono:style=Regular:size=10.6
+URxvt*boldFont:             xft:Roboto Mono:style=Medium:size=10.6
 
 ! Scrollbar
 URxvt.scrollStyle:          rxvt
 URxvt.scrollBar:            false
-
-! special
-*.foreground:   #eeffff
-*.background:   #282C33
-*.cursorColor:  #c0c5ce
-
-! black
-*.color0:       #2e343f
-*.color8:       #282C33
-
-! red
-*.color1:       #DE5062
-*.color9:       #C44450
-
-! green
-*.color2:       #8CDBAB
-*.color10:      #76B88F
-
-! yellow
-*.color3:       #fac55b
-*.color11:      #E8B353
-
-! blue
-*.color4:       #7CA9DB
-*.color12:      #719AC7
-
-! magenta
-*.color5:       #c792ea
-*.color13:      #AB7EC9
-
-! cyan
-*.color6:       #89ddff
-*.color14:      #79C2E0
-
-! white
-*.color7:       #eeffff
-*.color15:      #646E7F
 
 URxvt.perl-ext-common: default,matcher,font-size
 URxvt.font-size.step: 4
@@ -81,3 +47,7 @@ URxvt*scrollWithBuffer: true
 
 ! scroll back to the bottom on keypress
 URxvt*scrollTtyKeypress: true
+
+! disable icon insertion
+URxvt*iso14755: false
+URxvt*iso14755_52: false
