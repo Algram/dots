@@ -1,0 +1,20 @@
+{
+  username = "";
+  hostname = "";
+
+  openssh.authorizedKeys.keys = [];
+
+  syncthing.declarative = {
+    devices = {
+      some_device.addresses = [];
+      some_device.id = "";
+      some_device.introducer = true;
+    };
+
+    folders = {
+      some_folder.id = "";
+      some_folder.type = "";
+      some_folder.path = "";
+    };
+  };   
+}
