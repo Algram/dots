@@ -6,7 +6,17 @@
   configs, scripts, quality of life
 </p>
 
-## Setup
+## Usage
+
+This is everything to set up my workstation. All that needs to be done is renaming the `secrets-template.nix` to `secrets.nix` and fill out the variables.
+
+Afterwards only a single command is needed to set it up:
+
+```bash
+nixos-install
+```
+
+## Dotfiles
 
 The dotfiles setup is based on the concept from [jaagr](https://github.com/jaagr/dots). Basically everything is managed with a git repository and the `dots` alias.
 
