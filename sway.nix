@@ -39,8 +39,8 @@
         "1: web" = [{ class = "Firefox"; }];
         "2: dev" = [{ class = "Code"; }];
         "3: term" = [{ class = "Kitty"; }];
-        "4: social" = [{ class = "Signal"; } { class = "discord"; }];
-        "999: media" = [{ class = "obs"; }];
+        "4: social" = [{ class = "Signal"; }];
+        "999: media" = [{ class = "obs"; } { class = "discord"; } { title = "Picture-in-Picture"; }];
       };
 
       input = {
@@ -55,7 +55,7 @@
 
       output = {
         "*" = {
-          bg = "~/wall3.jpg fill";
+          bg = "~/wall4.jpg fill";
         };
 
         "DP-1" = {
@@ -160,7 +160,7 @@
 
       client.unfocused $color8 $color8 $foreground $color0 $color8
       client.focused_inactive $color8 $color8 $foreground $color0 $color8
-      client.focused $color0 $color15 $foreground $color0 $color15
+      client.focused $color0 $background $foreground $color0 $color15
       title_align center
       titlebar_border_thickness 0
       titlebar_padding 8
@@ -181,7 +181,7 @@
 
       for_window [title="Wine System Tray"] kill
 
-      for_window [app_id="firefox" title="^Picture-in-Picture$"] floating enable, move absolute position 1690 942, sticky enable
+      for_window [title="Picture-in-Picture"] floating enable, move absolute position 1690 942, sticky enable
 
       workspace 1: web output DP-1
       workspace 2: dev output DP-1

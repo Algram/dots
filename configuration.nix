@@ -42,6 +42,10 @@ in
       config.boot.kernelPackages.v4l2loopback
       pkgs.linuxPackages.asus-wmi-sensors
     ];
+
+    extraModprobeConfig = ''
+      options v4l2loopback video_nr=10,11 card_label="OBS","VirtualWebcam" exclusive_caps=1 devices=2
+    '';
   };
 
   hardware = {
@@ -233,16 +237,30 @@ in
       };
     };
 
-    # programs.firefox = {
-    #   enable = true;
-      # package = pkgs.firefox-wayland;
+    home.stateVersion = "21.03";
+
+
+    programs.firefox = {
+      enable = true;
+      # Until https://github.com/nix-community/home-manager/issues/1641 is fixed
+      package = pkgs.firefox-bin;
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; [
       #   https-everywhere
       #   privacy-badger
       #   ublock-origin
       #   decentraleyes
       # ];
-    # };
+
+      profiles.default = {
+        path = "1utyytkx.default";
+
+        settings = {
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        };
+
+        # userChrome = builtins.readFile ./dotfiles/userChrome/userChrome.css;
+      };
+    };
 
     programs.obs-studio = {
       enable = true;

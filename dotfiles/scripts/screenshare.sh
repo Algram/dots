@@ -44,3 +44,5 @@ else
 	notify-send -t 2000 "Wayland recording has been started"
 fi
 } > ~/.wayland-share-screen.log 2>&1
+
+# https://github.com/your-diary/v4l2_webcam/blob/master/v4l2_functions.sh

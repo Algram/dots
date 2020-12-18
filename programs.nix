@@ -1,13 +1,16 @@
 { config, pkgs, ... }: 
 let
   unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
+  waypkgs = (import "${builtins.fetchTarball https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz}/packages.nix");
 in {
   environment.systemPackages = with pkgs; [
       (steam.override {
     nativeOnly = true;
   }).run
+    waypkgs.wlogout
     steam
-    firefox
+    youtube-dl
+    # firefox
     # firefox-wayland Does currently not support Firefox Multi Account Containers
     libnfs
     nfs-utils
@@ -38,9 +41,13 @@ in {
     gnome3.libsecret
     gnome3.nautilus
     gnome3.shotwell
+    gnome3.eog
     gnupg
     gopass
     grim
+    gtk-engine-murrine
+    gtk_engines
+    xsettingsd
     gsettings-desktop-schemas
     gtk3
     hidapi
