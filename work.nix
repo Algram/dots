@@ -17,7 +17,7 @@ in {
     postman
     cypress
     teams
-    nodejs-12_x
+    nodejs-14_x
     python
     python27Packages.pip
     python38Packages.pip

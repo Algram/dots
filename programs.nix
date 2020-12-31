@@ -10,8 +10,8 @@ in {
     waypkgs.wlogout
     steam
     youtube-dl
-    # firefox
-    # firefox-wayland Does currently not support Firefox Multi Account Containers
+    # firefox Does currently not support Firefox Multi Account Containers
+    firefox-wayland
     libnfs
     nfs-utils
     liblockfile

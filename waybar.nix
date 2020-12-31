@@ -17,8 +17,8 @@ in {
         ];
         height = 30;
         modules-left = [ "sway/workspaces" "sway/mode" ];
-        modules-center = [ "clock" ];
-        modules-right = ["custom/battery-mouse" "custom/power"];
+        modules-center = [ "clock" "custom/recorder" ];
+        modules-right = ["custom/vpn" "custom/battery-mouse" "custom/power"];
         modules = {
           "sway/workspaces" = {
             disable-scroll = true;
@@ -32,22 +32,42 @@ in {
               "5: misc" = [];
             };
           };
+
           "sway/mode" = {
             format = "<span style=\"italic\">{}</span>";
           };
+
           "clock" = {
             interval = 30;
             format = " {:%d.%m.%Y |  %H:%M}";
           };
+
           "custom/battery-mouse" = {
             format = " {}";
             interval = 120;
             exec = "/etc/nixos/dotfiles/scripts/battery.sh";
           };
+
           "custom/power" = {
             format = "| ";
             interval = 120;
             on-click = "swaynag -t warning -m 'Power Menu Options' -b 'logout' 'swaymsg exit' -b 'suspend' 'swaymsg exec systemctl suspend' -b 'shutdown' 'systemctl shutdown' -b 'windows' 'systemctl reboot --boot-loader-entry=auto-windows'";
+          };
+
+          "custom/vpn" = {
+            format = " VPN | ";
+            exec = "echo '{\"class\": \"connected\"}'";
+            exec-if = "test -d /proc/sys/net/ipv4/conf/tun0";
+            return-type = "json";
+            interval = 5;
+          };
+
+          "custom/recorder" = {
+            format = "";
+            exec = "echo '{\"class\": \"recording\"}'";
+            exec-if = "pgrep wf-recorder";
+            return-type = "json";
+            interval = 5;
           };
         };
       }

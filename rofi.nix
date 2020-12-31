@@ -8,7 +8,7 @@ in {
     enable = true;
     package = unstable.rofi.override { plugins = [ unstable.rofi-emoji ]; };
 
-    font = "Roboto Mono 13";
+    font = "Roboto Mono Nerd Font 13";
     lines = 8;
     location = "center";
     theme = "/etc/nixos/dotfiles/rofi/theme.rasi";

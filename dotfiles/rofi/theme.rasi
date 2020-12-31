@@ -1,7 +1,11 @@
+configuration {
+  display-drun: "";
+}
+
 * {
-  background-color: #282C33;
-  border-color: #2e343f;
-  text-color: #8ca0aa;
+  background-color: #262b38;
+  border-color: #393b4a;
+  text-color: #F8F8F2;
   spacing: 0;
   width: 24em;
 }
@@ -12,12 +16,12 @@ inputbar {
 }
 
 prompt {
-  padding: 0.8em;
+  padding: 0.8em 0.9em 0.8em 0.8em;
   border: 0 1px 0 0;
 }
 
 textbox {
-  background-color: #2e343f;
+  background-color: #393b4a;
   border: 0 0 1px 0;
   border-color: #282C33;
   padding: 0.4em 0.8em;
@@ -39,5 +43,5 @@ element {
 }
 
 element selected {
-  background-color: #2e343f;
+  background-color: #393b4a;
 }
