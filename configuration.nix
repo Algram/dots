@@ -29,7 +29,7 @@ in {
 
     loader.timeout = 1;
 
-    # plymouth.enable = true;
+    plymouth.enable = true;
 
     kernel.sysctl = { "fs.inotify.max_user_watches" = 524288; };
     kernelModules = [
@@ -111,8 +111,6 @@ in {
     chromium = { enableWideVine = true; };
   };
 
-  services.rpcbind.enable = true;
-
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -160,8 +158,6 @@ in {
 
   # Enable disk utility
   services.udisks2.enable = true;
-
-  environment.variables.GIO_EXTRA_MODULES = [ "${pkgs.gvfs}/lib/gio/modules" ];
 
   programs.gnupg.agent = {
     enable = true;

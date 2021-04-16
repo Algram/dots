@@ -1,6 +1,5 @@
 { config, pkgs, ... }:
 let
-  unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
   waypkgs = (import "${
       builtins.fetchTarball
       "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz"
@@ -12,65 +11,51 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    wtype
     (steam.override { nativeOnly = true; }).run
-    sshfs
-    spotify
-    signal-desktop
-    lutris
-    esphome
-    waypkgs.wlogout
-    steam
-    youtube-dl
-    # firefox Does currently not support Firefox Multi Account Containers
-    firefox-wayland
-    libnfs
-    nfs-utils
-    wireshark
-    jq
-    imagemagick
-    ffmpeg-full
-    swappy
-    rustup
+    appimage-run
     ddccontrol
+    dfeet
     discord
     dropbox
-    gnome3.gnome-disk-utility
-    # DBus debugging tool
-    dfeet
+    esphome
+    ffmpeg-full
+    firefox-wayland
+    gimp
     git
-    unstable.razergenie
     glib
     gnome3.adwaita-icon-theme
+    gnome3.evince
+    gnome3.file-roller
     gnome3.gedit
+    gnome3.gnome-disk-utility
     gnome3.gnome-keyring
-    gnome3.gnome-system-monitor
     gnome3.gnome-logs
+    gnome3.gnome-system-monitor
     gnome3.libsecret
     gnome3.nautilus
     gnome3.shotwell
-    gnome3.file-roller
-    gnome3.evince
     gnupg
     gopass
     grim
-    gtk-engine-murrine
-    gtk_engines
-    xsettingsd
     gsettings-desktop-schemas
+    gtk_engines
+    gtk-engine-murrine
     gtk3
-    hidapi
+    imagemagick
+    jq
     keepassxc
     kitty
+    libnfs
     libnotify
     libusb
     lm_sensors
+    lutris
     mpv
-    gimp
     neovim
     networkmanager
     networkmanager-openconnect
     networkmanagerapplet
+    nfs-utils
     numix-icon-theme-circle
     pavucontrol
     pinentry-gnome
@@ -83,16 +68,21 @@ in {
     signal-desktop
     slurp
     sox
-    unstable.ungoogled-chromium
-    vim
-    vulkan-loader
+    spotify
+    sshfs
+    swappy
+    razergenie
+    ungoogled-chromium
+    unzip
+    v4l-utils
+    waypkgs.wlogout
     wireguard
+    wireshark
     wl-clipboard
+    wtype
     xdotool
     xsettingsd
     ydotool
-    v4l-utils
-    unzip
-    appimage-run
+    youtube-dl
   ];
 }
