@@ -1,12 +1,8 @@
-{ config, pkgs, ... }: 
+{ config, pkgs, ... }:
 let
   secrets = import ./secrets.nix;
   unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
 in {
-  # networking = {
-  #   extraHosts = "";
-  # };
-
   virtualisation.docker.enable = true;
 
   users.users.${secrets.username}.extraGroups = [ "docker" ];
@@ -22,5 +18,6 @@ in {
     python27Packages.pip
     python38Packages.pip
     libreoffice
+    p3x-onenote
   ];
 }

@@ -30,9 +30,15 @@
         { command = "wal --theme /etc/nixos/dotfiles/colors.json -t -n -e"; }
         { command = "code --folder-uri ~/Dropbox/notes"; }
         { command = "dropbox"; }
-        { command = "pulseeffects --gapplication-service"; }
+        { command = "sudo /etc/nixos/dotfiles/bin/ydotoold"; }
+        {
+          command = "pulseeffects --gapplication-service";
+        }
         # Maybe fixes fonts and or dbus openrazer
-        { command = "dbus-update-activation-environment $DISPLAY"; always = true; }
+        {
+          command = "dbus-update-activation-environment $DISPLAY";
+          always = true;
+        }
       ];
 
       assigns = {
@@ -40,7 +46,11 @@
         "2: dev" = [{ class = "Code"; }];
         "3: term" = [{ class = "Kitty"; }];
         "4: social" = [{ class = "Signal"; }];
-        "999: media" = [{ class = "obs"; } { class = "discord"; } { title = "Picture-in-Picture"; }];
+        "999: media" = [
+          { class = "obs"; }
+          { class = "discord"; }
+          { title = "Picture-in-Picture"; }
+        ];
       };
 
       input = {
@@ -55,8 +65,14 @@
 
       output = {
         "*" = {
+          adaptive_sync = "off";
           bg = "~/wall4.jpg fill";
         };
+
+        # "DP-1" = {
+        #   mode = "2560x1440@143.912003Hz";
+        #   # pos = "1440 590";
+        # };
 
         "DP-1" = {
           mode = "2560x1440@143.912003Hz";
@@ -70,9 +86,7 @@
         };
       };
 
-      focus = {
-        followMouse = false;
-      };
+      focus = { followMouse = false; };
 
       gaps = {
         inner = 12;
@@ -80,79 +94,87 @@
         smartBorders = "on";
       };
 
-      window = {
-        hideEdgeBorders = "smart";
-      };
+      window = { hideEdgeBorders = "smart"; };
 
       fonts = [ "Roboto Mono 11" ];
 
       workspaceAutoBackAndForth = true;
 
-      keybindings = let
-        modifier = config.wayland.windowManager.sway.config.modifier;
-      in lib.mkOptionDefault {
-        "${modifier}+Return" = "exec kitty";
-        "${modifier}+1" = "workspace 1: web";
-        "${modifier}+2" = "workspace 2: dev";
-        "${modifier}+3" = "workspace 3: term";
-        "${modifier}+4" = "workspace 4: social";
-        "${modifier}+5" = "workspace 5: misc";
-        "${modifier}+6" = "workspace 6: temp";
-        "${modifier}+Escape" = ''workspace 999: media'';
-        "${modifier}+Shift+1" = "move container to workspace 1: web";
-        "${modifier}+Shift+2" = "move container to workspace 2: dev";
-        "${modifier}+Shift+3" = "move container to workspace 3: term";
-        "${modifier}+Shift+4" = "move container to workspace 4: social";
-        "${modifier}+Shift+5" = "move container to workspace 5: misc";
-        "${modifier}+Shift+6" = "move container to workspace 6: temp";
-        "${modifier}+Shift+Escape" = "move container to workspace 999: media";
-        "XF86AudioLowerVolume" = "exec /etc/nixos/dotfiles/scripts/volume.sh down";
-        "XF86AudioRaiseVolume" = "exec /etc/nixos/dotfiles/scripts/volume.sh up";
-        "${modifier}+XF86AudioLowerVolume" = "exec /etc/nixos/dotfiles/scripts/brightness.sh down";
-        "${modifier}+XF86AudioRaiseVolume" = "exec /etc/nixos/dotfiles/scripts/brightness.sh up";
-        "XF86AudioMute" = "exec /etc/nixos/dotfiles/scripts/volume.sh mute";
-        "${modifier}+w" = "kill";
-        "${modifier}+l" = "exec swaylock-fancy -e -t ''";
+      keybindings =
+        let modifier = config.wayland.windowManager.sway.config.modifier;
+        in lib.mkOptionDefault {
+          "${modifier}+Return" = "exec kitty";
+          "${modifier}+1" = "workspace 1: web";
+          "${modifier}+2" = "workspace 2: dev";
+          "${modifier}+3" = "workspace 3: term";
+          "${modifier}+4" = "workspace 4: social";
+          "${modifier}+5" = "workspace 5: misc";
+          "${modifier}+6" = "workspace 6: temp";
+          "${modifier}+Escape" = "workspace 999: media";
+          "${modifier}+Shift+1" = "move container to workspace 1: web";
+          "${modifier}+Shift+2" = "move container to workspace 2: dev";
+          "${modifier}+Shift+3" = "move container to workspace 3: term";
+          "${modifier}+Shift+4" = "move container to workspace 4: social";
+          "${modifier}+Shift+5" = "move container to workspace 5: misc";
+          "${modifier}+Shift+6" = "move container to workspace 6: temp";
+          "${modifier}+Shift+Escape" = "move container to workspace 999: media";
+          "XF86AudioLowerVolume" =
+            "exec /etc/nixos/dotfiles/scripts/volume.sh down";
+          "XF86AudioRaiseVolume" =
+            "exec /etc/nixos/dotfiles/scripts/volume.sh up";
+          "${modifier}+XF86AudioLowerVolume" =
+            "exec /etc/nixos/dotfiles/scripts/brightness.sh down";
+          "${modifier}+XF86AudioRaiseVolume" =
+            "exec /etc/nixos/dotfiles/scripts/brightness.sh up";
+          "XF86AudioMute" = "exec /etc/nixos/dotfiles/scripts/volume.sh mute";
+          "${modifier}+w" = "kill";
+          "${modifier}+l" = "exec swaylock-fancy -e -t ''";
 
-        # Launchers
-        "${modifier}+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh default";
-        "Mod1+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
-        "Ctrl+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
-        "Ctrl+Shift+space" = "exec clipman clear --all";
-        "Shift+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh emoji";
+          # Launchers
+          "${modifier}+space" =
+            "exec /etc/nixos/dotfiles/scripts/launcher.sh default";
+          "Mod1+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
+          "Ctrl+space" =
+            "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
+          "Ctrl+Shift+space" = "exec clipman clear --all";
 
-        # Umlauts
-        "${modifier}+a" = ''exec /etc/nixos/dotfiles/scripts/key.sh "a" "ä"'';
-        "${modifier}+Shift+a" = ''exec /etc/nixos/dotfiles/scripts/key.sh "a" "Ä"'';
-        "${modifier}+o" = ''exec /etc/nixos/dotfiles/scripts/key.sh "o" "ö"'';
-        "${modifier}+Shift+o" = ''exec /etc/nixos/dotfiles/scripts/key.sh "o" "Ö"'';
-        "${modifier}+u" = ''exec /etc/nixos/dotfiles/scripts/key.sh "u" "ü"'';
-        "${modifier}+Shift+u" = ''exec /etc/nixos/dotfiles/scripts/key.sh "u" "Ü"'';
-        "${modifier}+s" = ''exec /etc/nixos/dotfiles/scripts/key.sh "s" "ß"'';
+          # Umlauts
+          "${modifier}+a" = ''exec /etc/nixos/dotfiles/scripts/key.sh "a" "ä"'';
+          "${modifier}+Shift+a" =
+            ''exec /etc/nixos/dotfiles/scripts/key.sh "a" "Ä"'';
+          "${modifier}+o" = ''exec /etc/nixos/dotfiles/scripts/key.sh "o" "ö"'';
+          "${modifier}+Shift+o" =
+            ''exec /etc/nixos/dotfiles/scripts/key.sh "o" "Ö"'';
+          "${modifier}+u" = ''exec /etc/nixos/dotfiles/scripts/key.sh "u" "ü"'';
+          "${modifier}+Shift+u" =
+            ''exec /etc/nixos/dotfiles/scripts/key.sh "u" "Ü"'';
+          "${modifier}+s" = ''exec /etc/nixos/dotfiles/scripts/key.sh "s" "ß"'';
 
-        # Screenshots
-        "${modifier}+Shift+i" = "exec /etc/nixos/dotfiles/scripts/screen.sh area";
-        "${modifier}+Shift+w" = "exec /etc/nixos/dotfiles/scripts/screen.sh window";
-        "${modifier}+Shift+p" = "exec /etc/nixos/dotfiles/scripts/screen.sh color";
-        "${modifier}+Shift+v" = "exec /etc/nixos/dotfiles/scripts/screen.sh record_area";
+          # Screenshots
+          "${modifier}+Shift+i" =
+            "exec /etc/nixos/dotfiles/scripts/screen.sh area";
+          "${modifier}+Shift+s" =
+            "exec /etc/nixos/dotfiles/scripts/screen.sh annotate";
+          "${modifier}+Shift+w" =
+            "exec /etc/nixos/dotfiles/scripts/screen.sh window";
+          "${modifier}+Shift+p" =
+            "exec /etc/nixos/dotfiles/scripts/screen.sh color";
+          "${modifier}+Shift+v" =
+            "exec /etc/nixos/dotfiles/scripts/screen.sh record_area";
 
-        # Scratchpad
-        "${modifier}+n" = "scratchpad show";
-        "${modifier}+Shift+n" = "move scratchpad";
+          # Scratchpad
+          "${modifier}+n" = "scratchpad show";
+          "${modifier}+Shift+n" = "move scratchpad";
 
-        # Layout modifiers
-        "${modifier}+m" = "layout toggle tabbed split";
-        "${modifier}+c" = "layout toggle split";
-        "${modifier}+f" = "fullscreen";
-        "${modifier}+Shift+f" = "floating toggle";
-        "${modifier}+Shift+s" = "sticky toggle";
-      };
+          # Layout modifiers
+          "${modifier}+m" = "layout toggle tabbed split";
+          "${modifier}+c" = "layout toggle split";
+          "${modifier}+f" = "fullscreen";
+          "${modifier}+Shift+f" = "floating toggle";
+          # "${modifier}+Shift+s" = "sticky toggle";
+        };
 
-      bars = [
-        {
-          command = "waybar";
-        }
-      ];
+      bars = [{ command = "waybar"; }];
     };
 
     extraConfig = ''

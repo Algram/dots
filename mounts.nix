@@ -4,7 +4,7 @@ let
 in {
   boot.supportedFilesystems = [ "ntfs" ];
 
-  fileSystems."/home/${secrets.hostname}/Games" ={
+  fileSystems."/home/${secrets.username}/GamesWindows" ={
     device = "/dev/nvme0n1p3";
     fsType = "ntfs"; 
     options = [ "rw" ];

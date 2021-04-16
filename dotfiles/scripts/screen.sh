@@ -14,6 +14,8 @@ record_area() {
 
 if [ "$1" == "area" ]; then
   grim -g "$(slurp -w 0 -b 00000066)" - | wl-copy -t image/png
+elif [ "$1" == "annotate" ]; then
+  grim -g "$(slurp -w 0 -b 00000066)" - | GTK_THEME=Materia:dark GTK_ICON_THEME=numix swappy -f - -o - | wl-copy -t image/png
 elif [ "$1" == "record_area" ]; then
   record_area
 elif [ "$1" == "window" ]; then
@@ -33,3 +35,5 @@ elif [ "$1" == "color" ]; then
 
   notify-send -i $HOME/.cache/color.jpg "$hex" "$rgb"
 fi
+
+# https://jan-sl.de/itryarch/screenshots/

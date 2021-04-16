@@ -1,12 +1,24 @@
-{ config, pkgs, ... }: 
+{ config, pkgs, ... }:
 let
   unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
-  waypkgs = (import "${builtins.fetchTarball https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz}/packages.nix");
+  waypkgs = (import "${
+      builtins.fetchTarball
+      "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz"
+    }/packages.nix");
 in {
+  nixpkgs.config = {
+    allowUnfree = true;
+    chromium.enableWideVine = true;
+  };
+
   environment.systemPackages = with pkgs; [
-      (steam.override {
-    nativeOnly = true;
-  }).run
+    wtype
+    (steam.override { nativeOnly = true; }).run
+    sshfs
+    spotify
+    signal-desktop
+    lutris
+    esphome
     waypkgs.wlogout
     steam
     youtube-dl
@@ -14,17 +26,15 @@ in {
     firefox-wayland
     libnfs
     nfs-utils
-    liblockfile
     wireshark
     jq
     imagemagick
     ffmpeg-full
-    arduino
+    swappy
     rustup
     ddccontrol
     discord
     dropbox
-    unstable.firefox-wayland
     gnome3.gnome-disk-utility
     # DBus debugging tool
     dfeet
@@ -34,14 +44,13 @@ in {
     gnome3.adwaita-icon-theme
     gnome3.gedit
     gnome3.gnome-keyring
-    gnome3.gnome-screenshot
     gnome3.gnome-system-monitor
-    gnome3.gnome-tweak-tool
     gnome3.gnome-logs
     gnome3.libsecret
     gnome3.nautilus
     gnome3.shotwell
-    gnome3.eog
+    gnome3.file-roller
+    gnome3.evince
     gnupg
     gopass
     grim
@@ -68,7 +77,7 @@ in {
     polkit
     polkit_gnome
     prusa-slicer
-    pulseeffects
+    pulseeffects-legacy
     pywal
     rrsync
     signal-desktop

@@ -5,21 +5,22 @@
 { config, pkgs, fetchFromGitHub, ... }:
 let
   secrets = import ./secrets.nix;
-  waypkgs = (import "${builtins.fetchTarball https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz}/packages.nix");
-in
-{
-  imports =
-    [
-      ./hardware-configuration.nix  # Include the results of the hardware scan.
-      ./loginManager.nix
-      ./home.nix
-      ./zsh.nix
-      ./programs.nix
-      ./work.nix
-      ./networking.nix
-      ./syncthing.nix
-      ./mounts.nix
-   ];
+  waypkgs = (import "${
+      builtins.fetchTarball
+      "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz"
+    }/packages.nix");
+in {
+  imports = [
+    ./hardware-configuration.nix # Include the results of the hardware scan.
+    ./loginManager.nix
+    ./home.nix
+    ./zsh.nix
+    ./programs.nix
+    ./work.nix
+    ./networking.nix
+    ./syncthing.nix
+    ./mounts.nix
+  ];
 
   boot = {
     # Use the systemd-boot EFI boot loader.
@@ -53,13 +54,16 @@ in
       extraPackages = with pkgs; [
         vaapiVdpau
         libvdpau-va-gl
+
+        # Vulkan
+        amdvlk
       ];
 
       # Needed for steam
       driSupport = true;
       driSupport32Bit = true;
     };
-    
+
     pulseaudio.enable = true;
     pulseaudio.support32Bit = true;
   };
@@ -82,6 +86,11 @@ in
       "i2c"
       "i2c-dev"
       "backlight"
+      # Esphome flashing
+      "tty"
+      "dialout"
+      # ADB
+      "adbusers"
     ];
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
@@ -99,9 +108,7 @@ in
     allowUnfree = true;
     allowBroken = true;
 
-    chromium = {
-      enableWideVine = true;
-    };
+    chromium = { enableWideVine = true; };
   };
 
   services.rpcbind.enable = true;
@@ -116,12 +123,7 @@ in
     enableDefaultFonts = true;
     fontDir.enable = true;
 
-    fonts = with pkgs; [
-      nerdfonts
-      roboto
-      roboto-mono
-      noto-fonts
-    ];
+    fonts = with pkgs; [ nerdfonts roboto roboto-mono noto-fonts ];
 
     fontconfig = {
       enable = true;
@@ -149,9 +151,7 @@ in
     passwordAuthentication = false;
   };
 
-  services.gnome3.gnome-settings-daemon = {
-    enable = true;
-  };
+  services.gnome3.gnome-settings-daemon = { enable = true; };
 
   services.dbus.packages = [ pkgs.gnome3.dconf ];
 
@@ -161,19 +161,27 @@ in
   # Enable disk utility
   services.udisks2.enable = true;
 
+  environment.variables.GIO_EXTRA_MODULES = [ "${pkgs.gvfs}/lib/gio/modules" ];
+
   programs.gnupg.agent = {
     enable = true;
-    pinentryFlavor = "gtk2";
+    pinentryFlavor = "gnome3";
   };
 
   environment.variables = {
-    XDG_CURRENT_DESKTOP = "sway"; # https://github.com/emersion/xdg-desktop-portal-wlr/issues/20
-    XDG_SESSION_TYPE = "wayland"; # https://github.com/emersion/xdg-desktop-portal-wlr/pull/11
+    XDG_CURRENT_DESKTOP =
+      "sway"; # https://github.com/emersion/xdg-desktop-portal-wlr/issues/20
+    XDG_SESSION_TYPE =
+      "wayland"; # https://github.com/emersion/xdg-desktop-portal-wlr/pull/11
   };
-  
+
+  programs.adb.enable = true;
+
   programs.dconf.enable = true;
 
   programs.sway.enable = true;
+
+  services.unifi = { enable = false; };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

@@ -2,11 +2,13 @@
   username = "";
   hostname = "";
 
-  openssh.authorizedKeys.keys = [];
+  networking.extraHosts = "";
+
+  openssh.authorizedKeys.keys = [ ];
 
   syncthing.declarative = {
     devices = {
-      some_device.addresses = [];
+      some_device.addresses = [ ];
       some_device.id = "";
       some_device.introducer = true;
     };
@@ -16,5 +18,5 @@
       some_folder.type = "";
       some_folder.path = "";
     };
-  };   
+  };
 }

@@ -5,14 +5,14 @@ configuration {
 * {
   background-color: #262b38;
   border-color: #393b4a;
-  text-color: #F8F8F2;
+  text-color: #f8f8f2;
   spacing: 0;
   width: 24em;
 }
 
 inputbar {
   border: 0 0 1px 0;
-  children: [prompt,entry];
+  children: [prompt, entry];
 }
 
 prompt {
@@ -23,7 +23,7 @@ prompt {
 textbox {
   background-color: #393b4a;
   border: 0 0 1px 0;
-  border-color: #282C33;
+  border-color: #282c33;
   padding: 0.4em 0.8em;
 }
 
@@ -40,6 +40,11 @@ listview {
 element {
   border: 0 0 1px 0;
   padding: 0.8em;
+}
+
+element-icon {
+  size: 1em;
+  margin: 0 0.2em 0 0;
 }
 
 element selected {

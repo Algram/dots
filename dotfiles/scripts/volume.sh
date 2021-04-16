@@ -55,7 +55,7 @@ function send_notification {
   fi
 
   # Send the volume indicator notification with mako
-  /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/tmp/.sound --hint=int:value:"$volume" "$bar $volume"
+  /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound --hint=int:value:"$volume" "$bar $volume"
 }
 
 case "$1" in
@@ -63,17 +63,11 @@ case "$1" in
     amixer set Master on > /dev/null &
     amixer sset Master 5%+ > /dev/null
 
-    # Play the freedesktop volume change sound
-    # play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &
-
     send_notification
   ;;
   down)
     amixer set Master on > /dev/null &
     amixer sset Master 5%- > /dev/null
-
-    # Play the freedesktop volume change sound
-    # play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &
 
     send_notification
   ;;
@@ -81,11 +75,8 @@ case "$1" in
     amixer set Master 1+ toggle > /dev/null
 
     if is_mute; then
-      /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/tmp/.sound "婢 Mute"
+      /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound "婢 Mute"
     else
-      # Play the freedesktop volume change sound
-      # play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga &
-
       send_notification
     fi
   ;;

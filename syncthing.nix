@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: 
+{ config, pkgs, ... }:
 let
   secrets = import ./secrets.nix;
   unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
