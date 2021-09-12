@@ -1,7 +1,4 @@
-{ config, pkgs, lib, ... }:
-
-let wal = builtins.fromJSON (builtins.readFile /etc/nixos/dotfiles/colors.json);
-in {
+{ config, pkgs, lib, ... }: {
   programs.rofi = {
     enable = true;
     font = "Roboto Mono Nerd Font 13";

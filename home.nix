@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
-let secrets = import ./secrets.nix;
+let
+  secrets = import ./secrets.nix;
 in {
   imports = [
     (import "${
@@ -37,9 +38,12 @@ in {
 
     gtk = {
       enable = true;
+      gtk3.extraConfig = {
+        gtk-application-prefer-dark-theme = 1;
+      };
       iconTheme = {
-        name = "Numix-Circle";
-        package = pkgs.numix-icon-theme-circle;
+        name = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme;
       };
       theme = {
         name = "Materia-light-compact";
@@ -47,10 +51,12 @@ in {
       };
     };
 
+    services.kdeconnect.enable = false;
+
     programs.firefox = {
       enable = true;
       # Until https://github.com/nix-community/home-manager/issues/1641 is fixed
-      package = pkgs.firefox-wayland;
+      # package = pkgs.firefox-wayland;
 
       profiles.default = {
         path = "1utyytkx.default";
@@ -61,9 +67,10 @@ in {
       };
     };
 
+
     programs.obs-studio = {
       enable = true;
-      plugins = with pkgs; [ obs-wlrobs obs-v4l2sink ];
+      plugins = with pkgs; [ obs-studio-plugins.wlrobs ];
     };
 
     services.gammastep = {

@@ -14,7 +14,7 @@ in {
       height = 30;
       modules-left = [ "sway/workspaces" "sway/mode" ];
       modules-center = [ "clock" "custom/recorder" ];
-      modules-right = [ "custom/vpn" "custom/battery-mouse" "custom/power" ];
+      modules-right = [ "custom/vpn" "custom/co2" "custom/battery-mouse" "custom/power" ];
       modules = {
         "sway/workspaces" = {
           disable-scroll = true;
@@ -40,6 +40,12 @@ in {
           format = " {}";
           interval = 120;
           exec = "/etc/nixos/dotfiles/scripts/battery.sh";
+        };
+
+        "custom/co2" = {
+          format = "煮 {} | ";
+          interval = 60;
+          exec = "/etc/nixos/dotfiles/scripts/co2.sh";
         };
 
         "custom/power" = {
@@ -88,9 +94,8 @@ in {
         opacity: 0.2;
       }
 
-      /* Media button */
-      window#waybar button:nth-child(6) {
-        background-color: ${wal.colors.color3};
+      window#waybar button#sway-workspace-screenshare {
+        background-color: ${wal.colors.color6};
         color: ${wal.special.background};
       }
 
@@ -115,6 +120,10 @@ in {
 
       #custom-power {
         min-width: 42px;
+      }
+
+      #custom-co2 {
+        font-size: 15px;
       }
     '';
   };

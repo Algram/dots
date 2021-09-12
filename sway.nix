@@ -11,7 +11,6 @@
 
   wayland.windowManager.sway = {
     enable = true;
-    package = pkgs.sway;
     wrapperFeatures.base = true;
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''
@@ -34,9 +33,14 @@
         {
           command = "pulseeffects --gapplication-service";
         }
-        # Maybe fixes fonts and or dbus openrazer
+        # Fixes various sway issues: https://github.com/NixOS/nixpkgs/issues/119445
         {
-          command = "dbus-update-activation-environment $DISPLAY";
+          command = "dbus-update-activation-environment WAYLAND_DISPLAY";
+          always = true;
+        }
+        {
+          command =
+            "systemctl --user import-environment WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
           always = true;
         }
       ];
@@ -46,11 +50,7 @@
         "2: dev" = [{ class = "Code"; }];
         "3: term" = [{ class = "Kitty"; }];
         "4: social" = [{ class = "Signal"; }];
-        "999: media" = [
-          { class = "obs"; }
-          { class = "discord"; }
-          { title = "Picture-in-Picture"; }
-        ];
+        "999: media" = [ { class = ".obs-wrapped"; } { class = "discord"; } ];
       };
 
       input = {
@@ -68,11 +68,6 @@
           adaptive_sync = "off";
           bg = "~/wall4.jpg fill";
         };
-
-        # "DP-1" = {
-        #   mode = "2560x1440@143.912003Hz";
-        #   # pos = "1440 590";
-        # };
 
         "DP-1" = {
           mode = "2560x1440@143.912003Hz";
@@ -96,7 +91,11 @@
 
       window = { hideEdgeBorders = "smart"; };
 
-      fonts = [ "Roboto Mono 11" ];
+      fonts = {
+        names = [ "Roboto" ];
+        style = "Regular";
+        size = 11.0;
+      };
 
       workspaceAutoBackAndForth = true;
 
@@ -153,7 +152,7 @@
           # Screenshots
           "${modifier}+Shift+i" =
             "exec /etc/nixos/dotfiles/scripts/screen.sh area";
-          "${modifier}+Shift+s" =
+          "${modifier}+Shift+d" =
             "exec /etc/nixos/dotfiles/scripts/screen.sh annotate";
           "${modifier}+Shift+w" =
             "exec /etc/nixos/dotfiles/scripts/screen.sh window";
@@ -161,6 +160,10 @@
             "exec /etc/nixos/dotfiles/scripts/screen.sh color";
           "${modifier}+Shift+v" =
             "exec /etc/nixos/dotfiles/scripts/screen.sh record_area";
+
+          # Screenshots
+          "${modifier}+Shift+s" =
+            "exec /etc/nixos/dotfiles/scripts/screenshare.sh";
 
           # Scratchpad
           "${modifier}+n" = "scratchpad show";
@@ -191,19 +194,17 @@
 
       exec_always {
           gsettings set $gnome-schema gtk-theme 'Materia-light-compact'
-          gsettings set $gnome-schema icon-theme 'Numix-Circle'
+          gsettings set $gnome-schema icon-theme 'Papirus-Dark'
           gsettings set $gnome-schema cursor-theme 'Adwaita'
       }
 
       for_window [title="Notes"] move scratchpad, urgent disable
 
       for_window [title=".*\(Private Browsing\).*"] move to workspace 999: media
-
-      for_window [title="Microsoft Teams Notification"] move absolute position 1130 px 48 px
-
       for_window [title="Wine System Tray"] kill
 
-      for_window [title="Picture-in-Picture"] floating enable, move absolute position 1690 942, sticky enable
+      for_window [title="Picture-in-Picture"] floating enable, move absolute position 0 942, sticky enable, move to workspace 999: media
+      for_window [title="Windowed Projector (Preview)"] fullscreen enable, move to workspace screenshare
 
       workspace 1: web output DP-1
       workspace 2: dev output DP-1
@@ -212,6 +213,7 @@
       workspace 5: misc output DP-1
       workspace 6: temp output DP-1
       workspace 999: media output DP-2
+      workspace screenshare output DP-1
     '';
   };
 }

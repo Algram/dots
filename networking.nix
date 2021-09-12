@@ -11,5 +11,10 @@ in {
     useDHCP = false;
     interfaces.enp6s0.useDHCP = true;
     networkmanager = { enable = true; };
+
+
+    # KDE Connect
+    # firewall.allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
+    # firewall.allowedUDPPortRanges = [ { from = 1714; to = 1764; } ];
   };
 }

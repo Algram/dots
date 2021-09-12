@@ -1,10 +1,5 @@
 { config, pkgs, ... }:
-let
-  waypkgs = (import "${
-      builtins.fetchTarball
-      "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz"
-    }/packages.nix");
-in {
+{
   nixpkgs.config = {
     allowUnfree = true;
     chromium.enableWideVine = true;
@@ -56,7 +51,6 @@ in {
     networkmanager-openconnect
     networkmanagerapplet
     nfs-utils
-    numix-icon-theme-circle
     pavucontrol
     pinentry-gnome
     polkit
@@ -75,7 +69,6 @@ in {
     ungoogled-chromium
     unzip
     v4l-utils
-    waypkgs.wlogout
     wireguard
     wireshark
     wl-clipboard

@@ -1,1 +1,5 @@
 secrets.nix
+secrets
+flake.lock
+flake-test.nix
+hardware-configuration.nix

@@ -7,6 +7,7 @@ in {
     user = secrets.username;
     dataDir = "/home/${secrets.username}/syncthing";
     configDir = "/home/${secrets.username}/syncthing/.config/syncthing";
-    declarative = secrets.syncthing.declarative;
+    folders = secrets.syncthing.folders;
+    devices = secrets.syncthing.devices;
   };
 }

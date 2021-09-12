@@ -5,10 +5,6 @@
 { config, pkgs, fetchFromGitHub, ... }:
 let
   secrets = import ./secrets.nix;
-  waypkgs = (import "${
-      builtins.fetchTarball
-      "https://github.com/colemickens/nixpkgs-wayland/archive/master.tar.gz"
-    }/packages.nix");
 in {
   imports = [
     ./hardware-configuration.nix # Include the results of the hardware scan.
@@ -22,6 +18,13 @@ in {
     ./mounts.nix
   ];
 
+  nix = {
+    package = pkgs.nixUnstable;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+   };
+
   boot = {
     # Use the systemd-boot EFI boot loader.
     loader.systemd-boot.enable = true;
@@ -30,6 +33,9 @@ in {
     loader.timeout = 1;
 
     plymouth.enable = true;
+
+    kernelPackages = pkgs.linuxPackages_5_4;
+    # kernelPackages = pkgs.linuxPackages_latest;
 
     kernel.sysctl = { "fs.inotify.max_user_watches" = 524288; };
     kernelModules = [
@@ -40,12 +46,8 @@ in {
     ];
     extraModulePackages = [
       config.boot.kernelPackages.v4l2loopback
-      pkgs.linuxPackages.asus-wmi-sensors
+      config.boot.kernelPackages.asus-wmi-sensors
     ];
-
-    extraModprobeConfig = ''
-      options v4l2loopback video_nr=10,11 card_label="OBS","VirtualWebcam" exclusive_caps=1 devices=2
-    '';
   };
 
   hardware = {
@@ -54,12 +56,9 @@ in {
       extraPackages = with pkgs; [
         vaapiVdpau
         libvdpau-va-gl
-
-        # Vulkan
-        amdvlk
       ];
 
-      # Needed for steam
+      # Needed for Steam
       driSupport = true;
       driSupport32Bit = true;
     };
@@ -68,7 +67,12 @@ in {
     pulseaudio.support32Bit = true;
   };
 
-  hardware.openrazer.enable = true;
+  hardware.openrazer = {
+    enable = true;
+    users = [ secrets.username ];
+  };
+
+  hardware.enableRedistributableFirmware = true;
 
   powerManagement.cpuFreqGovernor = "ondemand";
 
@@ -81,8 +85,6 @@ in {
       "networkmanager"
       "audio"
       "syncthing"
-      # Required for openrazer-daemon
-      "plugdev"
       "i2c"
       "i2c-dev"
       "backlight"
@@ -106,7 +108,7 @@ in {
 
   nixpkgs.config = {
     allowUnfree = true;
-    allowBroken = true;
+    allowBroken = false;
 
     chromium = { enableWideVine = true; };
   };
@@ -134,10 +136,7 @@ in {
     enable = true;
     gtkUsePortal = true;
 
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-      waypkgs.xdg-desktop-portal-wlr
-    ];
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
   };
 
   services.pipewire.enable = true;
@@ -149,7 +148,7 @@ in {
     passwordAuthentication = false;
   };
 
-  services.gnome3.gnome-settings-daemon = { enable = true; };
+  services.gnome.gnome-settings-daemon = { enable = true; };
 
   services.dbus.packages = [ pkgs.gnome3.dconf ];
 
@@ -175,6 +174,7 @@ in {
 
   programs.dconf.enable = true;
 
+  # Needed for login manager session file
   programs.sway.enable = true;
 
   services.unifi = { enable = false; };

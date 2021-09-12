@@ -6,7 +6,7 @@
 
   openssh.authorizedKeys.keys = [ ];
 
-  syncthing.declarative = {
+  syncthing = {
     devices = {
       some_device.addresses = [ ];
       some_device.id = "";
