@@ -6,6 +6,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    terraform
     (steam.override { nativeOnly = true; }).run
     appimage-run
     ddccontrol

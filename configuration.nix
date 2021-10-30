@@ -18,12 +18,12 @@ in {
     ./mounts.nix
   ];
 
-  nix = {
-    package = pkgs.nixUnstable;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-   };
+  # nix = {
+  #   package = pkgs.nixUnstable;
+  #   # extraOptions = ''
+    #   experimental-features = nix-command flakes
+    # '';
+  #  };
 
   boot = {
     # Use the systemd-boot EFI boot loader.
@@ -34,8 +34,8 @@ in {
 
     plymouth.enable = true;
 
-    kernelPackages = pkgs.linuxPackages_5_4;
-    # kernelPackages = pkgs.linuxPackages_latest;
+    # kernelPackages = pkgs.linuxPackages_5_4;
+    kernelPackages = pkgs.linuxPackages_latest;
 
     kernel.sysctl = { "fs.inotify.max_user_watches" = 524288; };
     kernelModules = [
@@ -176,8 +176,6 @@ in {
 
   # Needed for login manager session file
   programs.sway.enable = true;
-
-  services.unifi = { enable = false; };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

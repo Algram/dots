@@ -3,3 +3,6 @@ secrets
 flake.lock
 flake-test.nix
 hardware-configuration.nix
+!servers/**/hardware-configuration.nix
+.terraform*
+terraform*

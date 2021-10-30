@@ -4,11 +4,11 @@
 
   networking.extraHosts = "";
 
-  openssh.authorizedKeys.keys = [ ];
+  openssh.authorizedKeys.keys = [];
 
   syncthing = {
     devices = {
-      some_device.addresses = [ ];
+      some_device.addresses = [];
       some_device.id = "";
       some_device.introducer = true;
     };

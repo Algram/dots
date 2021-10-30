@@ -1,5 +1,6 @@
 configuration {
   display-drun: "";
+  lines: 8;
 }
 
 * {
