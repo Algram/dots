@@ -8,6 +8,7 @@ in {
 
     layer = "overlay";
     icons = true;
+    maxIconSize = 14;
     font = "Roboto Mono 16px";
     defaultTimeout = 3000;
     anchor = "top-center";

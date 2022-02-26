@@ -4,16 +4,31 @@
     allowUnfree = true;
     chromium.enableWideVine = true;
   };
+ 
+  programs.steam.enable = true;
+
+    nixpkgs.config.packageOverrides = pkgs: {
+    steam = pkgs.steam.override {
+      extraPkgs = pkgs: with pkgs; [
+        pipewire
+      ];
+    };
+  };
 
   environment.systemPackages = with pkgs; [
+    qt5.qtwayland
     terraform
-    (steam.override { nativeOnly = true; }).run
+    (pkgs.steam.override { extraLibraries = pkgs: [ pkgs.pipewire ]; })
     appimage-run
     ddccontrol
     dfeet
     discord
     dropbox
+    alsa-utils # For volume control script
     esphome
+    # For pactl
+    pulseaudio
+    pamixer # For volume control script
     ffmpeg-full
     firefox-wayland
     gimp
@@ -27,9 +42,8 @@
     gnome3.gnome-keyring
     gnome3.gnome-logs
     gnome3.gnome-system-monitor
-    gnome3.libsecret
     gnome3.nautilus
-    gnome3.shotwell
+    shotwell
     gnupg
     gopass
     grim

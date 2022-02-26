@@ -35,7 +35,7 @@
         }
         # Fixes various sway issues: https://github.com/NixOS/nixpkgs/issues/119445
         {
-          command = "dbus-update-activation-environment WAYLAND_DISPLAY";
+          command = "dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway";
           always = true;
         }
         {
@@ -54,6 +54,14 @@
       };
 
       input = {
+        "1452:599:Bluetooth_3.0_Macro_Keyboard" = {
+          # Disable acceleration
+          accel_profile = "adaptive";
+
+          # Set the dpi to speed ratio (like mouse speed settings in windows)
+          pointer_accel = "1";
+        };
+
         "type:pointer" = {
           # Disable acceleration
           accel_profile = "flat";
@@ -66,7 +74,7 @@
       output = {
         "*" = {
           adaptive_sync = "off";
-          bg = "~/wall4.jpg fill";
+          bg = "~/wall7.jpg fill";
         };
 
         "DP-1" = {
@@ -78,6 +86,11 @@
           mode = "2560x1440@143.912003Hz";
           transform = "270";
           pos = "0 0";
+        };
+
+        "HDMI-A-1" = {
+          disable = "disable";
+          mode = "3840x2160@60.000Hz";
         };
       };
 

@@ -56,7 +56,7 @@ in {
     programs.firefox = {
       enable = true;
       # Until https://github.com/nix-community/home-manager/issues/1641 is fixed
-      # package = pkgs.firefox-wayland;
+      package = pkgs.firefox-wayland;
 
       profiles.default = {
         path = "1utyytkx.default";

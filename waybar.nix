@@ -10,11 +10,11 @@ in {
     settings = [{
       layer = "top";
       position = "top";
-      output = [ "DP-1" ];
-      height = 30;
+      output = [ "DP-1" "HDMI-A-1" ];
+      height = 38;
       modules-left = [ "sway/workspaces" "sway/mode" ];
       modules-center = [ "clock" "custom/recorder" ];
-      modules-right = [ "custom/vpn" "custom/co2" "custom/battery-mouse" "custom/power" ];
+      modules-right = [ "custom/vpn" "custom/radon" "custom/co2" "custom/battery-mouse" "custom/power" ];
       modules = {
         "sway/workspaces" = {
           disable-scroll = true;
@@ -46,6 +46,12 @@ in {
           format = "煮 {} | ";
           interval = 60;
           exec = "/etc/nixos/dotfiles/scripts/co2.sh";
+        };
+
+        "custom/radon" = {
+          format = " {} | ";
+          interval = 60;
+          exec = "/etc/nixos/dotfiles/scripts/radon.sh";
         };
 
         "custom/power" = {

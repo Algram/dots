@@ -12,9 +12,18 @@ in {
     interfaces.enp6s0.useDHCP = true;
     networkmanager = { enable = true; };
 
-
     # KDE Connect
     # firewall.allowedTCPPortRanges = [ { from = 1714; to = 1764; } ];
     # firewall.allowedUDPPortRanges = [ { from = 1714; to = 1764; } ];
+
+    # SimpleSoundShare
+    # firewall.allowedTCPPorts = [ 8000 8001 ];
+    
+    # Kodi Remote
+    #     firewall.allowedTCPPorts = [ 8080 9090 ];
+    # firewall.allowedUDPPorts = [ 8080 9090 5353 ];
+    firewall.enable = true;
   };
+
+  services.mullvad-vpn.enable = true;
 }

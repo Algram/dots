@@ -36,13 +36,43 @@ in {
 
   nixpkgs.config.allowUnfree = true;
 
-  services.unifi.enable = true;
+  services.unifi.enable = false;
   services.unifi.openPorts = false;
   services.unifi.unifiPackage = pkgs.unifiStable;
 
   security.sudo = {
     enable = true;
     wheelNeedsPassword = false;
+  };
+
+  time.timeZone = "Europe/Berlin";
+  
+  services.mosquitto.enable = true;
+  services.mosquitto.listeners = [
+    {
+      omitPasswordAuth = true;
+      settings.allow_anonymous = true;
+      acl = [ "pattern readwrite #" ];
+      users = {};
+    }
+  ];
+
+  # networking.nat.enable = true;
+  # networking.nat.internalInterfaces = ["ve-homeassistant"];
+  # networking.nat.externalInterface = "enp0s25";
+  # networking.networkmanager.unmanaged = [ "interface-name:ve-homeassistant" ];
+
+  virtualisation.oci-containers = {
+    backend = "podman";
+    containers.homeassistant = {
+      volumes = [ "/home/woodhouse/hass:/config" ];
+      environment.TZ = "Europe/Berlin";
+      image = "ghcr.io/home-assistant/home-assistant:2022.2.9";
+      extraOptions = [ 
+        "--privileged"
+        "--network=host"
+      ];
+    };
   };
 
   programs.zsh = {
@@ -53,7 +83,6 @@ in {
     shellAliases = {
       config = "sudo vim /etc/nixos/configuration.nix";
       upgrade = "sudo nixos-rebuild switch --upgrade";
-      hello = "echo hello-world";
     };
 
     ohMyZsh = {
@@ -135,14 +164,14 @@ in {
     options = "--delete-older-than 30d";
   };
   
-  system.autoUpgrade.enable = true;
+  system.autoUpgrade.enable = false;
 
   services.logind.lidSwitch = "ignore";
 
   networking.firewall.allowedTCPPorts = [ 8123 6053 1883 8080 8880 8843 8443 ];
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 ];
 
-  environment.systemPackages = with pkgs; [ vim zsh mosquitto git speedtest-cli];
+  environment.systemPackages = with pkgs; [ vim zsh git];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

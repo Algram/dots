@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, fetchFromGitHub, ... }:
+{ config, pkgs, lib, fetchFromGitHub, ... }:
 let
   secrets = import ./secrets.nix;
 in {
@@ -16,23 +16,31 @@ in {
     ./networking.nix
     ./syncthing.nix
     ./mounts.nix
+    ./virtualization.nix
   ];
 
-  # nix = {
-  #   package = pkgs.nixUnstable;
-  #   # extraOptions = ''
-    #   experimental-features = nix-command flakes
-    # '';
-  #  };
+  nix = {
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+   };
 
   boot = {
     # Use the systemd-boot EFI boot loader.
-    loader.systemd-boot.enable = true;
+    loader.systemd-boot = {
+      enable = true;
+      consoleMode = "auto";
+    };
     loader.efi.canTouchEfiVariables = true;
 
     loader.timeout = 1;
 
     plymouth.enable = true;
+
+    initrd = {
+      verbose = false;
+      kernelModules = [ "amdgpu" ];
+    };
 
     # kernelPackages = pkgs.linuxPackages_5_4;
     kernelPackages = pkgs.linuxPackages_latest;
@@ -43,6 +51,8 @@ in {
       "asus_wmi_sensors"
       # Support controlling display brightness via ddccontrol
       "i2c-dev"
+      # Bluetooth USB dongle support
+      "btusb"
     ];
     extraModulePackages = [
       config.boot.kernelPackages.v4l2loopback
@@ -63,14 +73,18 @@ in {
       driSupport32Bit = true;
     };
 
-    pulseaudio.enable = true;
-    pulseaudio.support32Bit = true;
+    # Replaced by pipewire
+    pulseaudio.enable = false;
+    pulseaudio.support32Bit = false;
   };
 
   hardware.openrazer = {
     enable = true;
     users = [ secrets.username ];
   };
+
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
 
   hardware.enableRedistributableFirmware = true;
 
@@ -123,7 +137,7 @@ in {
     enableDefaultFonts = true;
     fontDir.enable = true;
 
-    fonts = with pkgs; [ nerdfonts roboto roboto-mono noto-fonts ];
+    fonts = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) roboto roboto-mono noto-fonts noto-fonts-emoji ];
 
     fontconfig = {
       enable = true;
@@ -132,15 +146,51 @@ in {
     };
   };
 
-  xdg.portal = {
+  services.printing.enable = true;
+  services.printing.drivers = with pkgs; [ brlaser ];
+  services.avahi.enable = true;
+  # Important to resolve .local domains of printers, otherwise you get an error
+  # like  "Impossible to connect to XXX.local: Name or service not known"
+  services.avahi.nssmdns = true;
+
+  # xdg.portal = {
+  #   enable = true;
+  #   gtkUsePortal = true;
+
+  #   extraPortals = with pkgs; [ xdg-desktop-portal xdg-desktop-portal-gnome xdg-desktop-portal-wlr ];
+  # };
+
+  # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
+  xdg.portal =
+    let
+      gnome = config.services.xserver.desktopManager.gnome.enable;
+    in
+    {
+      enable = true;
+      wlr = {
+        enable = true;
+        settings = {
+          screencast = {
+            # output_name = "eDP-1";
+            max_fps = 30;
+            # exec_before = "pkill mako";
+            # exec_after = "mako";
+            chooser_type = "default";
+          };
+        };
+      };
+      extraPortals = [ pkgs.xdg-desktop-portal-wlr ]
+        ++ lib.optional (!gnome) pkgs.xdg-desktop-portal-gtk;
+      gtkUsePortal = false;
+    };
+
+  services.pipewire = {
     enable = true;
-    gtkUsePortal = true;
-
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
+    socketActivation = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
   };
-
-  services.pipewire.enable = true;
-  services.pipewire.socketActivation = true;
 
   services.openssh = {
     enable = true;
@@ -150,7 +200,7 @@ in {
 
   services.gnome.gnome-settings-daemon = { enable = true; };
 
-  services.dbus.packages = [ pkgs.gnome3.dconf ];
+  services.dbus.packages = [ pkgs.dconf ];
 
   # Enable auto-mounting of usb drives in nautilus and protocol support for sftp
   services.gvfs.enable = true;
@@ -171,6 +221,8 @@ in {
   };
 
   programs.adb.enable = true;
+
+  services.fwupd.enable = true;
 
   programs.dconf.enable = true;
 

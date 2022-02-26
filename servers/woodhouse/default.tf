@@ -16,6 +16,6 @@ module "deploy_nixos" {
   target_user          = var.target_user
   target_host          = var.target_host
   ssh_agent            = false
-  build_on_target      = true
   ssh_private_key_file = var.ssh_private_key_file
+  build_on_target      = true
 }

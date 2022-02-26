@@ -7,16 +7,8 @@
 # ./volume down     -->			Decrease volume by 5
 # ./volume mute     -->			Mute
 
-function get_volume {
-  amixer get Master | grep '%' | head -n 1 | cut -d '[' -f 2 | cut -d '%' -f 1
-}
-
-function is_mute {
-  amixer get Master | grep '%' | grep -oE '[^ ]+$' | grep off > /dev/null
-}
-
 function send_notification {
-  volume=$(get_volume)
+  volume=$(pamixer --get-volume)
 
   if [ "$volume" -eq 100 ]; then
     bar="墳"
@@ -55,26 +47,27 @@ function send_notification {
   fi
 
   # Send the volume indicator notification with mako
-  /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound --hint=int:value:"$volume" "$bar $volume"
+  # /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound --hint=int:value:"$volume" "$bar $volume"
+  /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound -i /home/raphael/Downloads/volume-up-solid.svg --hint=int:value:"$volume" "$volume"
 }
 
 case "$1" in
   up)
-    amixer set Master on > /dev/null &
-    amixer sset Master 5%+ > /dev/null
+    pamixer -u
+    pamixer -i 5
 
     send_notification
   ;;
   down)
-    amixer set Master on > /dev/null &
-    amixer sset Master 5%- > /dev/null
+    pamixer -u
+    pamixer -d 5
 
     send_notification
   ;;
   mute)
-    amixer set Master 1+ toggle > /dev/null
+    pamixer -t
 
-    if is_mute; then
+    if pamixer --get-mute; then
       /etc/nixos/dotfiles/scripts/external/notify-send.sh -t 1000 --replace-file=/home/raphael/.temp/sound "婢 Mute"
     else
       send_notification
