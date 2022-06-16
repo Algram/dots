@@ -22,7 +22,10 @@ in {
     # Kodi Remote
     #     firewall.allowedTCPPorts = [ 8080 9090 ];
     # firewall.allowedUDPPorts = [ 8080 9090 5353 ];
-    firewall.enable = true;
+
+    # firewall.allowedTCPPorts = [ 43385 ];
+    # firewall.allowedUDPPorts = [ 43385 ];
+    firewall.enable = false;
   };
 
   services.mullvad-vpn.enable = true;

@@ -41,12 +41,15 @@ in {
       gtk3.extraConfig = {
         gtk-application-prefer-dark-theme = 1;
       };
+      gtk4.extraConfig = {
+        gtk-application-prefer-dark-theme = true;
+      };
       iconTheme = {
         name = "Papirus-Dark";
         package = pkgs.papirus-icon-theme;
       };
       theme = {
-        name = "Materia-light-compact";
+        name = "Materia-dark-compact";
         package = pkgs.materia-theme;
       };
     };
@@ -70,11 +73,11 @@ in {
 
     programs.obs-studio = {
       enable = true;
-      plugins = with pkgs; [ obs-studio-plugins.wlrobs ];
+      plugins = with pkgs; [ obs-studio-plugins.wlrobs (callPackage ./obs-hyperion.nix { inherit (qt5) qtbase wrapQtAppsHook; }) ];
     };
 
     services.gammastep = {
-      enable = true;
+      enable = false;
       # Berlin coordinates
       latitude = "52.5200";
       longitude = "13.405";

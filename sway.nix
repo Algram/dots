@@ -29,7 +29,8 @@
         { command = "wal --theme /etc/nixos/dotfiles/colors.json -t -n -e"; }
         { command = "code --folder-uri ~/Dropbox/notes"; }
         { command = "dropbox"; }
-        { command = "sudo /etc/nixos/dotfiles/bin/ydotoold"; }
+        { command = "ydotoold"; }
+        { command = "sh /etc/nixos/dotfiles/scripts/listener.sh"; }
         {
           command = "pulseeffects --gapplication-service";
         }
@@ -75,11 +76,13 @@
         "*" = {
           adaptive_sync = "off";
           bg = "~/wall7.jpg fill";
+          max_render_time = "3";
         };
 
         "DP-1" = {
           mode = "2560x1440@143.912003Hz";
           pos = "1440 590";
+          max_render_time = "3";
         };
 
         "DP-2" = {
@@ -92,6 +95,12 @@
           disable = "disable";
           mode = "3840x2160@60.000Hz";
         };
+
+
+        # "HDMI-A-1" = {
+        #   mode = "2540x1440@60.000Hz";
+        #   pos = "1440 590";
+        # };
       };
 
       focus = { followMouse = false; };
@@ -107,7 +116,6 @@
       fonts = {
         names = [ "Roboto" ];
         style = "Regular";
-        size = 11.0;
       };
 
       workspaceAutoBackAndForth = true;
@@ -202,11 +210,12 @@
       title_align center
       titlebar_border_thickness 0
       titlebar_padding 8
+      default_border pixel 0
 
       set $gnome-schema org.gnome.desktop.interface
 
       exec_always {
-          gsettings set $gnome-schema gtk-theme 'Materia-light-compact'
+          gsettings set $gnome-schema gtk-theme 'Materia-dark-compact'
           gsettings set $gnome-schema icon-theme 'Papirus-Dark'
           gsettings set $gnome-schema cursor-theme 'Adwaita'
       }

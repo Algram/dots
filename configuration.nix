@@ -75,7 +75,7 @@ in {
 
     # Replaced by pipewire
     pulseaudio.enable = false;
-    pulseaudio.support32Bit = false;
+    pulseaudio.support32Bit = true;
   };
 
   hardware.openrazer = {
@@ -161,35 +161,45 @@ in {
   # };
 
   # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
-  xdg.portal =
-    let
-      gnome = config.services.xserver.desktopManager.gnome.enable;
-    in
-    {
+  xdg.portal = {
       enable = true;
       wlr = {
         enable = true;
         settings = {
           screencast = {
+            
             # output_name = "eDP-1";
             max_fps = 30;
             # exec_before = "pkill mako";
             # exec_after = "mako";
-            chooser_type = "default";
+            chooser_type = "none";
+            output_name = "HDMI-A-1";
+
+          #             chooser_type = "simple";
+          # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
           };
+        #           screencast = { 
+        #   max_fps = 30; 
+        #   chooser_type = "simple";
+        #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+        # };
         };
       };
-      extraPortals = [ pkgs.xdg-desktop-portal-wlr ]
-        ++ lib.optional (!gnome) pkgs.xdg-desktop-portal-gtk;
-      gtkUsePortal = false;
-    };
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-wlr
+        xdg-desktop-portal-gtk
+      ];
+      gtkUsePortal = true;
+  };
 
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     socketActivation = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    wireplumber.enable = true;
   };
 
   services.openssh = {

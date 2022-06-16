@@ -36,7 +36,7 @@ in {
 
   nixpkgs.config.allowUnfree = true;
 
-  services.unifi.enable = false;
+  services.unifi.enable = true;
   services.unifi.openPorts = false;
   services.unifi.unifiPackage = pkgs.unifiStable;
 
@@ -67,12 +67,71 @@ in {
     containers.homeassistant = {
       volumes = [ "/home/woodhouse/hass:/config" ];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2022.2.9";
+      image = "ghcr.io/home-assistant/home-assistant:2022.6";
       extraOptions = [ 
         "--privileged"
         "--network=host"
       ];
     };
+    containers.node-red = {
+      volumes = [ "/home/woodhouse/node-red:/data" ];
+      environment.TZ = "Europe/Berlin";
+      image = "nodered/node-red";
+      ports = [ "1880:1880" ];
+      extraOptions = [ 
+        "--network=host"
+      ];
+    };
+  };
+
+  services.nginx = {
+      enable = true;
+      recommendedProxySettings = true;
+      recommendedTlsSettings = true;
+      # other Nginx options
+      virtualHosts."home.${secrets.domain}" =  {
+        useACMEHost = "home.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8123";
+          proxyWebsockets = true; # needed if you need to use WebSocket
+          # extraConfig =
+          #   # required when the target is also TLS server with multiple hosts
+          #   "proxy_ssl_server_name on;" +
+          #   # required when the server wants to use HTTP Authentication
+          #   "proxy_pass_header Authorization;"
+          #   ;
+        };
+      };
+
+      virtualHosts."node-red.${secrets.domain}" =  {
+        useACMEHost = "node-red.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:1880";
+        };
+      };
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    email = "aliasgram@gmail.com";
+  };
+
+  security.acme.certs."home.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  };
+
+  security.acme.certs."node-red.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
   };
 
   programs.zsh = {
@@ -168,7 +227,7 @@ in {
 
   services.logind.lidSwitch = "ignore";
 
-  networking.firewall.allowedTCPPorts = [ 8123 6053 1883 8080 8880 8843 8443 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8080 8880 8843 8443 1880 ];
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 ];
 
   environment.systemPackages = with pkgs; [ vim zsh git];

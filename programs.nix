@@ -13,10 +13,24 @@
         pipewire
       ];
     };
+
+  #     esphome_pr = pkgs.esphome.overrideAttrs (oldAttrs: rec {
+  #   src = pkgs.fetchFromGitHub {
+  #     owner = "esphome";
+  #     repo = "esphome";
+  #     rev = "dev";
+  #     sha256 = "sha256-pw9TQnswx6saL7rBjtrbCc3gCWNY55i/4mc9B/76+24=";
+  #   };
+
+  #     postPatch = '''';
+  # });
   };
+
 
   environment.systemPackages = with pkgs; [
     qt5.qtwayland
+    # For vscode nix file formatting
+    nixfmt
     terraform
     (pkgs.steam.override { extraLibraries = pkgs: [ pkgs.pipewire ]; })
     appimage-run
@@ -26,6 +40,7 @@
     dropbox
     alsa-utils # For volume control script
     esphome
+    # esphome_pr
     # For pactl
     pulseaudio
     pamixer # For volume control script
@@ -71,6 +86,7 @@
     polkit
     polkit_gnome
     prusa-slicer
+    slic3r
     pulseeffects-legacy
     pywal
     rrsync
@@ -79,18 +95,26 @@
     sox
     spotify
     sshfs
+    scrcpy
     swappy
     razergenie
-    ungoogled-chromium
+    ungoogled-chromium # chromium --enable-features=UseOzonePlatform --ozone-platform=wayland
     unzip
     v4l-utils
-    wireguard
+    wireguard-tools
     wireshark
     wl-clipboard
     wtype
     xdotool
     xsettingsd
+    # Deprecated. Remove daemon from sway as well
     ydotool
     youtube-dl
+    # LOL Lutris
+    openssl
+    bluez
+    hyperion-ng
+    pika-backup
+    drawing
   ];
 }
