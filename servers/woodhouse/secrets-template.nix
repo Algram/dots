@@ -12,4 +12,9 @@
     CLOUDFLARE_EMAIL=
     CLOUDFLARE_API_KEY=
   '';
+
+  influxdb.username = "";
+  influxdb.password = "";
+  influxdb.organization = "";
+  influxdb.telegraf.token = "";
 }

@@ -7,25 +7,13 @@
  
   programs.steam.enable = true;
 
-    nixpkgs.config.packageOverrides = pkgs: {
+  nixpkgs.config.packageOverrides = pkgs: {
     steam = pkgs.steam.override {
       extraPkgs = pkgs: with pkgs; [
         pipewire
       ];
     };
-
-  #     esphome_pr = pkgs.esphome.overrideAttrs (oldAttrs: rec {
-  #   src = pkgs.fetchFromGitHub {
-  #     owner = "esphome";
-  #     repo = "esphome";
-  #     rev = "dev";
-  #     sha256 = "sha256-pw9TQnswx6saL7rBjtrbCc3gCWNY55i/4mc9B/76+24=";
-  #   };
-
-  #     postPatch = '''';
-  # });
   };
-
 
   environment.systemPackages = with pkgs; [
     qt5.qtwayland
@@ -86,8 +74,7 @@
     polkit
     polkit_gnome
     prusa-slicer
-    slic3r
-    pulseeffects-legacy
+    # pulseeffects-legacy
     pywal
     rrsync
     signal-desktop
@@ -113,8 +100,10 @@
     # LOL Lutris
     openssl
     bluez
-    hyperion-ng
+    # hyperion-ng
     pika-backup
     drawing
+    element-desktop-wayland
+    element-web
   ];
 }

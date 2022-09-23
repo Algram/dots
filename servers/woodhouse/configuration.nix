@@ -52,10 +52,62 @@ in {
     {
       omitPasswordAuth = true;
       settings.allow_anonymous = true;
-      acl = [ "pattern readwrite #" ];
+      acl = [ "topic readwrite #" "pattern readwrite #" ];
       users = {};
     }
+    # {
+    #   port = 8883;
+    #   users.openwb = {
+    #     # acl = [ "pattern readwrite #" ];
+    #     password = "12345";
+    #   };
+    #   users.homeassistant = {
+    #     # acl = [ "pattern readwrite #" ];
+    #     password = "12345";
+    #   };
+    #   settings = {
+    #     cafile = "/var/lib/acme/mqtt/fullchain.pem";
+    #     certfile = "/var/lib/acme/mqtt/cert.pem";
+    #     keyfile = "/var/lib/acme/mqtt/key.pem";
+    #     require_certificate = true;
+    #     # use_identity_as_username = true;
+    #     tls_version = "tlsv1.2";
+    #   };
+    # },
   ];
+
+  services.mosquitto.bridges.openwb = {
+      addresses = [
+        { address = "192.168.1.253"; port = 1883; }
+      ];
+      topics = [ "openWB/# both 2"];
+      settings = {
+        start_type = "automatic";
+        local_clientid = "openwb.mosquitto";
+        try_private = false;
+        cleansession = true;
+      };
+    };
+
+  services.telegraf = {
+    enable = true;
+    extraConfig = {
+      outputs.influxdb_v2 = {
+        urls = [ "https://influxdb.${secrets.domain}" ];
+        bucket = "openwb";
+        token = secrets.influxdb.telegraf.token;
+        organization = secrets.influxdb.organization;
+      };
+
+      inputs.mqtt_consumer = {
+        servers = [ "tcp://127.0.0.1:1883" ];
+        topics = [  "openWB/global/#" "openWB/evu/#" "openWB/lp/#" "openWB/pv/#"];
+        client_id = "openwb-telegraf";
+        data_format = "value";
+        data_type = "float";
+      };
+    };
+  };
 
   # networking.nat.enable = true;
   # networking.nat.internalInterfaces = ["ve-homeassistant"];
@@ -64,20 +116,53 @@ in {
 
   virtualisation.oci-containers = {
     backend = "podman";
+    # autoPrune = {
+    #   enable = true;
+    # };
     containers.homeassistant = {
       volumes = [ "/home/woodhouse/hass:/config" ];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2022.6";
+      image = "ghcr.io/home-assistant/home-assistant:2022.9";
       extraOptions = [ 
         "--privileged"
         "--network=host"
       ];
     };
+
     containers.node-red = {
       volumes = [ "/home/woodhouse/node-red:/data" ];
       environment.TZ = "Europe/Berlin";
-      image = "nodered/node-red";
+      image = "nodered/node-red:2.2.3";
       ports = [ "1880:1880" ];
+      extraOptions = [ 
+        "--network=host"
+      ];
+    };
+
+    containers.grafana = {
+      volumes = [ "/home/woodhouse/grafana:/var/lib/grafana" ];
+      environment.TZ = "Europe/Berlin";
+      environment.GF_SERVER_DOMAIN = "grafana.${secrets.domain}";
+      image = "grafana/grafana-oss:9.1.5";
+      ports = [ "3000:3000" ];
+      extraOptions = [ 
+        "--network=host"
+        "--user=1000" # https://grafana.com/docs/grafana/v9.0/setup-grafana/configure-docker/#run-grafana-container-using-bind-mounts
+      ];
+    };
+
+    containers.influxdb= {
+      volumes = [ "/home/woodhouse/influxdb/data:/var/lib/influxdb2" "/home/woodhouse/influxdb/config:/etc/influxdb2"];
+      environment = {
+        TZ = "Europe/Berlin";
+        DOCKER_INFLUXDB_INIT_MODE = "setup";
+        DOCKER_INFLUXDB_INIT_USERNAME = secrets.influxdb.username;
+        DOCKER_INFLUXDB_INIT_PASSWORD = secrets.influxdb.password;
+        DOCKER_INFLUXDB_INIT_ORG = "home";
+        DOCKER_INFLUXDB_INIT_BUCKET = "default";
+      };
+      image = "influxdb:2.4.0";
+      ports = [ "8086:8086" ];
       extraOptions = [ 
         "--network=host"
       ];
@@ -104,11 +189,31 @@ in {
         };
       };
 
+      # systemctl status acme-node-red.${secrets.domain}.service
       virtualHosts."node-red.${secrets.domain}" =  {
         useACMEHost = "node-red.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:1880";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."influxdb.${secrets.domain}" =  {
+        useACMEHost = "influxdb.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8086";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."grafana.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3000";
+          proxyWebsockets = true;
         };
       };
   };
@@ -134,6 +239,22 @@ in {
     credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
   };
 
+  security.acme.certs."influxdb.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  };
+
+  security.acme.certs."grafana.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  };
+
   programs.zsh = {
     enable = true;
     autosuggestions.enable = true;
@@ -151,59 +272,6 @@ in {
       plugins = [ "git" "z" ];
     };
   };
-
-  services.home-assistant = {
-    enable = false;
-    config = {
-      homeassistant = {
-        name = "Home";
-        time_zone = "Europe/Berlin";
-        latitude = "0.0";
-        longitude = "0.0";
-        elevation = 0;
-      };
-      mqtt = {
-        broker = "127.0.0.1";
-        port = 1883;
-        discovery = true;
-      };
-      logger = { logs = { "homeassistant.components.mqtt" = "debug"; }; };
-      esphome = { };
-      wled = { };
-      zeroconf = { };
-      mobile_app = { };
-      recorder = { };
-      history = { };
-      frontend = { };
-      sun = { };
-      http = { };
-      sensor = [
-        {
-          name = "temperature_lora_0";
-          platform = "mqtt";
-          state_topic = "application/1/device/0505050505050505/event/up";
-          value_template = "{{ value_json.object.temperature }}";
-          unit_of_measurement = "°C";
-        }
-        {
-          name = "humidity_lora_0";
-          platform = "mqtt";
-          state_topic = "application/1/device/0505050505050505/event/up";
-          value_template = "{{ value_json.object.humidity }}";
-          unit_of_measurement = "%";
-        }
-        {
-          name = "moisture_lora_0";
-          platform = "mqtt";
-          state_topic = "application/1/device/0404040404040404/event/up";
-          value_template = "{{ value_json.object.moisture }}";
-          unit_of_measurement = "%";
-        }
-      ];
-    };
-  };
-
-  virtualisation.docker.enable = true;
 
   services.tlp = {
     enable = true;
@@ -227,7 +295,7 @@ in {
 
   services.logind.lidSwitch = "ignore";
 
-  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8080 8880 8843 8443 1880 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 ];
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 ];
 
   environment.systemPackages = with pkgs; [ vim zsh git];
@@ -239,6 +307,5 @@ in {
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "21.05"; # Did you read the comment?
-
 }
 

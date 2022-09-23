@@ -31,8 +31,8 @@ if [ "$1" == "disable" ]; then
 elif [ "$1" == "enable" ]; then
   swaymsg output HDMI-A-1 enable
   swaymsg "[workspace=1]" move workspace to output HDMI-A-1
-  hyperiond &
-  env QT_QPA_PLATFORM=xcb obs
+  /home/raphael/Downloads/nixpkgs/result/bin/hyperiond &
+  env QT_QPA_PLATFORM=wayland obs
   pactl set-default-sink alsa_output.pci-0000_0a_00.1.hdmi-stereo
 fi
 

@@ -31,9 +31,9 @@
         { command = "dropbox"; }
         { command = "ydotoold"; }
         { command = "sh /etc/nixos/dotfiles/scripts/listener.sh"; }
-        {
-          command = "pulseeffects --gapplication-service";
-        }
+        # {
+        #   command = "pulseeffects --gapplication-service";
+        # }
         # Fixes various sway issues: https://github.com/NixOS/nixpkgs/issues/119445
         {
           command = "dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway";
@@ -51,24 +51,40 @@
         "2: dev" = [{ class = "Code"; }];
         "3: term" = [{ class = "Kitty"; }];
         "4: social" = [{ class = "Signal"; }];
-        "999: media" = [ { class = ".obs-wrapped"; } { class = "discord"; } ];
+        "999: media" = [ { class = ".obs-wrapped"; } { class = "discord"; } {app_id = "com.obsproject.Studio"; }];
       };
 
       input = {
-        "1452:599:Bluetooth_3.0_Macro_Keyboard" = {
-          # Disable acceleration
-          accel_profile = "adaptive";
+        # "type:pointer" = {
+        #   # Disable acceleration
+        #   accel_profile = "flat";
 
-          # Set the dpi to speed ratio (like mouse speed settings in windows)
-          pointer_accel = "1";
-        };
+        #   # Set the dpi to speed ratio (like mouse speed settings in windows)
+        #   pointer_accel = "-0.25";
+        # };
 
-        "type:pointer" = {
+        "5426:123:Razer_Razer_Viper_Ultimate_Dongle" = {
           # Disable acceleration
           accel_profile = "flat";
 
           # Set the dpi to speed ratio (like mouse speed settings in windows)
           pointer_accel = "-0.25";
+        };
+
+
+        "5426:122:Razer_Razer_Viper_Ultimate" = {
+          # Disable acceleration
+          accel_profile = "flat";
+
+          # Set the dpi to speed ratio (like mouse speed settings in windows)
+          pointer_accel = "-0.25";
+        };
+
+        "1133:16461:Logitech_K400_Plus" = {
+          accel_profile = "adaptive";
+
+          # Set the dpi to speed ratio (like mouse speed settings in windows)
+          pointer_accel = "1";
         };
       };
 
@@ -76,13 +92,13 @@
         "*" = {
           adaptive_sync = "off";
           bg = "~/wall7.jpg fill";
-          max_render_time = "3";
+          max_render_time = "1";
         };
 
         "DP-1" = {
           mode = "2560x1440@143.912003Hz";
           pos = "1440 590";
-          max_render_time = "3";
+          max_render_time = "1";
         };
 
         "DP-2" = {
@@ -90,17 +106,6 @@
           transform = "270";
           pos = "0 0";
         };
-
-        "HDMI-A-1" = {
-          disable = "disable";
-          mode = "3840x2160@60.000Hz";
-        };
-
-
-        # "HDMI-A-1" = {
-        #   mode = "2540x1440@60.000Hz";
-        #   pos = "1440 590";
-        # };
       };
 
       focus = { followMouse = false; };
