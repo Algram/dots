@@ -6,12 +6,12 @@ in {
   users.users.${secrets.username}.extraGroups = [ "docker" ];
 
   environment.systemPackages = with pkgs; [
-    (yarn.override { nodejs = nodejs-16_x; })
+    (yarn.override { nodejs = nodejs-18_x; })
     google-chrome
-    nodejs-16_x
+    nodejs-18_x
     python
-    python27Packages.pip
     python38Packages.pip
     libreoffice
+    nodePackages.pnpm
   ];
 }

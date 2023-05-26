@@ -3,7 +3,7 @@
 let
   wal = builtins.fromJSON (builtins.readFile /etc/nixos/dotfiles/colors.json);
 in {
-  programs.mako = {
+  services.mako = {
     enable = true;
 
     layer = "overlay";

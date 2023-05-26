@@ -8,6 +8,7 @@ let
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./cachix.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -20,8 +21,10 @@ in {
 
   services.openssh = {
     enable = true;
-    permitRootLogin = "no";
-    passwordAuthentication = false;
+    settings = {
+      permitRootLogin = "no";
+      passwordAuthentication = false;
+    };
   };
 
   services.fwupd.enable = true;
@@ -38,7 +41,7 @@ in {
 
   services.unifi.enable = true;
   services.unifi.openPorts = false;
-  services.unifi.unifiPackage = pkgs.unifiStable;
+  services.unifi.unifiPackage = pkgs.unifi7;
 
   security.sudo = {
     enable = true;
@@ -85,27 +88,47 @@ in {
         start_type = "automatic";
         local_clientid = "openwb.mosquitto";
         try_private = false;
-        cleansession = true;
+        # cleansession = true; # Can lead to messages being retained more often
       };
     };
 
   services.telegraf = {
     enable = true;
     extraConfig = {
-      outputs.influxdb_v2 = {
-        urls = [ "https://influxdb.${secrets.domain}" ];
-        bucket = "openwb";
-        token = secrets.influxdb.telegraf.token;
-        organization = secrets.influxdb.organization;
-      };
+      outputs.influxdb_v2 = [
+        {
+          urls = [ "https://influxdb.${secrets.domain}" ];
+          bucket = "energy";
+          token = secrets.influxdb.telegraf.energy.token;
+          organization = secrets.influxdb.organization;
+          name_override = "energy";
+          namepass = ["energy*"];
+        }
+        {
+          urls = [ "https://influxdb.${secrets.domain}" ];
+          bucket = "openwb";
+          token = secrets.influxdb.telegraf.token;
+          organization = secrets.influxdb.organization;
+        }
+      ];
 
-      inputs.mqtt_consumer = {
-        servers = [ "tcp://127.0.0.1:1883" ];
-        topics = [  "openWB/global/#" "openWB/evu/#" "openWB/lp/#" "openWB/pv/#"];
-        client_id = "openwb-telegraf";
-        data_format = "value";
-        data_type = "float";
-      };
+      inputs.mqtt_consumer = [
+        {
+          servers = [ "tcp://127.0.0.1:1883" ];
+          topics = [  "energy/#"];
+          client_id = "energy-telegraf";
+          data_format = "value";
+          name_override = "energy";
+          data_type = "float";
+        }
+        {
+          servers = [ "tcp://127.0.0.1:1883" ];
+          topics = [  "openWB/global/#" "openWB/evu/#" "openWB/lp/#" "openWB/pv/#" "openWB/SmartHome/#"];
+          client_id = "openwb-telegraf";
+          data_format = "value";
+          data_type = "float";
+        }
+      ];
     };
   };
 
@@ -122,7 +145,7 @@ in {
     containers.homeassistant = {
       volumes = [ "/home/woodhouse/hass:/config" ];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2022.9";
+      image = "ghcr.io/home-assistant/home-assistant:2023.4.6";
       extraOptions = [ 
         "--privileged"
         "--network=host"
@@ -132,7 +155,7 @@ in {
     containers.node-red = {
       volumes = [ "/home/woodhouse/node-red:/data" ];
       environment.TZ = "Europe/Berlin";
-      image = "nodered/node-red:2.2.3";
+      image = "nodered/node-red:3.0.2";
       ports = [ "1880:1880" ];
       extraOptions = [ 
         "--network=host"
@@ -143,7 +166,11 @@ in {
       volumes = [ "/home/woodhouse/grafana:/var/lib/grafana" ];
       environment.TZ = "Europe/Berlin";
       environment.GF_SERVER_DOMAIN = "grafana.${secrets.domain}";
-      image = "grafana/grafana-oss:9.1.5";
+      environment.GF_SECURITY_ALLOW_EMBEDDING = "true";
+      environment.GF_AUTH_DISABLE_LOGIN_FORM = "true";
+      environment.GF_AUTH_ANONYMOUS_ENABLED = "true";
+      environment.GF_AUTH_ANONYMOUS_ORG_ROLE = "Admin";
+      image = "grafana/grafana-oss:9.4.3";
       ports = [ "3000:3000" ];
       extraOptions = [ 
         "--network=host"
@@ -161,7 +188,7 @@ in {
         DOCKER_INFLUXDB_INIT_ORG = "home";
         DOCKER_INFLUXDB_INIT_BUCKET = "default";
       };
-      image = "influxdb:2.4.0";
+      image = "influxdb:2.7.0";
       ports = [ "8086:8086" ];
       extraOptions = [ 
         "--network=host"
@@ -216,6 +243,15 @@ in {
           proxyWebsockets = true;
         };
       };
+
+      virtualHosts."unifi.${secrets.domain}" =  {
+        useACMEHost = "unifi.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "https://127.0.0.1:8443";
+          proxyWebsockets = true;
+        };
+      };
   };
 
   security.acme = {
@@ -248,6 +284,14 @@ in {
   };
 
   security.acme.certs."grafana.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  };
+
+  security.acme.certs."unifi.${secrets.domain}" = {
     domain = "*.${secrets.domain}";
     group = "nginx";
     dnsProvider = "cloudflare";
@@ -295,10 +339,11 @@ in {
 
   services.logind.lidSwitch = "ignore";
 
-  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 ];
-  networking.firewall.allowedUDPPorts = [ 5353 3478 10001 ];
+  # 9522 for SMA Home Manager multicast messages
+  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 ];
+  networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 ];
 
-  environment.systemPackages = with pkgs; [ vim zsh git];
+  environment.systemPackages = with pkgs; [ vim zsh git netavark]; # netavark needed for podman at the moment
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

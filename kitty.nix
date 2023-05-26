@@ -6,6 +6,7 @@
       window_padding_width = "8.0";
       wheel_scroll_multiplier = "32.0";
       touch_scroll_multiplier = "32.0";
+      confirm_os_window_close = 0;
     };
   };
 }

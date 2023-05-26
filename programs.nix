@@ -19,6 +19,8 @@
     qt5.qtwayland
     # For vscode nix file formatting
     nixfmt
+    # playwright
+    #  playwright.browsers
     terraform
     (pkgs.steam.override { extraLibraries = pkgs: [ pkgs.pipewire ]; })
     appimage-run
@@ -28,24 +30,27 @@
     dropbox
     alsa-utils # For volume control script
     esphome
+    libcec
     # esphome_pr
     # For pactl
     pulseaudio
     pamixer # For volume control script
     ffmpeg-full
+    alsaLib
     firefox-wayland
     gimp
     git
     glib
-    gnome3.adwaita-icon-theme
-    gnome3.evince
-    gnome3.file-roller
-    gnome3.gedit
-    gnome3.gnome-disk-utility
-    gnome3.gnome-keyring
-    gnome3.gnome-logs
-    gnome3.gnome-system-monitor
-    gnome3.nautilus
+    gnome.adwaita-icon-theme
+    gnome.evince
+    gnome.file-roller
+    gnome.gedit
+    gnome.gnome-disk-utility
+    gnome.gnome-keyring
+    gnome.seahorse
+    gnome.gnome-logs
+    gnome.gnome-system-monitor
+    gnome.nautilus
     shotwell
     gnupg
     gopass
@@ -60,7 +65,8 @@
     kitty
     libnfs
     libnotify
-    libusb
+    libusb1
+    openscad
     lm_sensors
     lutris
     mpv
@@ -74,6 +80,7 @@
     polkit
     polkit_gnome
     prusa-slicer
+    super-slicer-latest
     # pulseeffects-legacy
     pywal
     rrsync
@@ -81,6 +88,7 @@
     slurp
     sox
     spotify
+    kicad
     sshfs
     scrcpy
     swappy
@@ -100,10 +108,13 @@
     # LOL Lutris
     openssl
     bluez
-    # hyperion-ng
+    hyperion-ng
+    # hyperhdr
     pika-backup
     drawing
     element-desktop-wayland
     element-web
+    obsidian
+    appimage-run
   ];
 }

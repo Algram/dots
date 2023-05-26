@@ -1,4 +1,6 @@
 { config, pkgs, lib, ... }: {
+  programs.starship.enable = true;
+
   programs.zsh = {
     enable = true;
     autosuggestions.enable = true;
@@ -14,13 +16,12 @@
       upgrade-local = "sudo nixos-rebuild switch -I nixpkgs=.";
       k = "kubectl";
     };
-
     ohMyZsh = {
       enable = true;
-      customPkgs = with pkgs; [
-        spaceship-prompt
-      ];
-      theme = "spaceship";
+      # customPkgs = with pkgs; [
+      #   spaceship-prompt
+      # ];
+      # theme = "spaceship";
       plugins = [ "git" "z" ];
     };
   };

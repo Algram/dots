@@ -63,17 +63,13 @@ in {
 
       profiles.default = {
         path = "1utyytkx.default";
-
-        settings = {
-          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        };
       };
     };
 
 
     programs.obs-studio = {
       enable = true;
-      #plugins = with pkgs; [ obs-studio-plugins.wlrobs ];
+      plugins = with pkgs; [ obs-studio-plugins.wlrobs ];
       # plugins = with pkgs; [ obs-studio-plugins.wlrobs (callPackage /home/raphael/Downloads/nixpkgs/pkgs/applications/video/obs-studio/plugins/obs-hyperion/default.nix { inherit (qt5) qtbase; }) ];
       # plugins = with pkgs; [ obs-studio-plugins.wlrobs obs-studio-plugins.obs-hyperion ];
     };

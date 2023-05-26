@@ -53,11 +53,16 @@ in {
       "i2c-dev"
       # Bluetooth USB dongle support
       "btusb"
+      "v4l2loopback"
     ];
     extraModulePackages = [
       config.boot.kernelPackages.v4l2loopback
       config.boot.kernelPackages.asus-wmi-sensors
     ];
+
+    # extraModprobeConfig = ''
+    #   options v4l2loopback exclusive_caps=1 video_nr=9 card_label=VirtualVideoDevice
+    # '';
   };
 
   hardware = {
@@ -139,12 +144,35 @@ in {
 
     fonts = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) roboto roboto-mono noto-fonts noto-fonts-emoji ];
 
+    # fontconfig = {
+    #   enable = true;
+    #   antialias = true;
+    #   hinting.autohint = true;
+    #   defaultFonts.monospace = [ "Roboto Mono" ];
+    # };
+
     fontconfig = {
-      enable = true;
+      # Fixes pixelation
       antialias = true;
-      defaultFonts.monospace = [ "Roboto Mono" ];
+
+      # Fixes antialiasing blur
+      hinting = {
+        enable = true;
+        style = "hintfull"; # no difference
+        autohint = true; # no difference
+      };
+
+      subpixel = {
+        # Makes it bolder
+        rgba = "rgb";
+        lcdfilter = "default"; # no difference
+      };
     };
   };
+
+           nixpkgs.config.permittedInsecurePackages = [
+                "python-2.7.18.6"
+              ];
 
   services.printing.enable = true;
   services.printing.drivers = with pkgs; [ brlaser ];
@@ -152,13 +180,6 @@ in {
   # Important to resolve .local domains of printers, otherwise you get an error
   # like  "Impossible to connect to XXX.local: Name or service not known"
   services.avahi.nssmdns = true;
-
-  # xdg.portal = {
-  #   enable = true;
-  #   gtkUsePortal = true;
-
-  #   extraPortals = with pkgs; [ xdg-desktop-portal xdg-desktop-portal-gnome xdg-desktop-portal-wlr ];
-  # };
 
   # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
   xdg.portal = {
@@ -189,7 +210,6 @@ in {
         xdg-desktop-portal-wlr
         xdg-desktop-portal-gtk
       ];
-      gtkUsePortal = true;
   };
 
   security.rtkit.enable = true;
@@ -204,8 +224,10 @@ in {
 
   services.openssh = {
     enable = true;
-    permitRootLogin = "no";
-    passwordAuthentication = false;
+    settings = {
+      permitRootLogin = "no";
+      passwordAuthentication = false;
+    };
   };
 
   services.gnome.gnome-settings-daemon = { enable = true; };
@@ -224,6 +246,7 @@ in {
   };
 
   environment.variables = {
+    MOZ_ENABLE_WAYLAND = "1";
     XDG_CURRENT_DESKTOP =
       "sway"; # https://github.com/emersion/xdg-desktop-portal-wlr/issues/20
     XDG_SESSION_TYPE =

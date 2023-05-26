@@ -42,47 +42,59 @@
   # ];
 
 
-  services.xserver.displayManager.gdm = {
+  # services.xserver.displayManager.gdm = {
+  #   enable = true;
+  #   wayland = true;
+  # }; 
+
+  #   # Extracted from nixos/modules/services/x11/xserver.nix
+  # systemd.defaultUnit = "graphical.target";
+  # systemd.services.display-manager =
+  #   let
+  #     cfg = config.services.xserver.displayManager;
+  #   in
+  #   {
+  #     description = "Display Manager";
+
+  #     after = [ "acpid.service" "systemd-logind.service" ];
+
+  #     restartIfChanged = false;
+
+  #     environment =
+  #       lib.optionalAttrs
+  #         config.hardware.opengl.setLdLibraryPath {
+  #         LD_LIBRARY_PATH = pkgs.addOpenGLRunpath.driverLink;
+  #       } // cfg.job.environment;
+
+  #     preStart =
+  #       ''
+  #         ${cfg.job.preStart}
+
+  #         rm -f /tmp/.X0-lock
+  #       '';
+
+  #     script = "${cfg.job.execCmd}";
+
+  #     serviceConfig = {
+  #       Restart = "always";
+  #       RestartSec = "200ms";
+  #       SyslogIdentifier = "display-manager";
+  #       # Stop restarting if the display manager stops (crashes) 2 times
+  #       # in one minute. Starting X typically takes 3-4s.
+  #       StartLimitInterval = "30s";
+  #       StartLimitBurst = "3";
+  #     };
+  #   };
+
+  services.xserver.enable = true;
+  services.xserver.displayManager.defaultSession = "sway";
+  services.xserver.displayManager.lightdm = {
     enable = true;
-    wayland = true;
-  }; 
+    greeters.pantheon.enable = true;
+  };
+  services.xserver.libinput.enable = true;
+  services.xserver.layout = "us";
+  services.xserver.dpi = 96;
 
-    # Extracted from nixos/modules/services/x11/xserver.nix
-  systemd.defaultUnit = "graphical.target";
-  systemd.services.display-manager =
-    let
-      cfg = config.services.xserver.displayManager;
-    in
-    {
-      description = "Display Manager";
-
-      after = [ "acpid.service" "systemd-logind.service" ];
-
-      restartIfChanged = false;
-
-      environment =
-        lib.optionalAttrs
-          config.hardware.opengl.setLdLibraryPath {
-          LD_LIBRARY_PATH = pkgs.addOpenGLRunpath.driverLink;
-        } // cfg.job.environment;
-
-      preStart =
-        ''
-          ${cfg.job.preStart}
-
-          rm -f /tmp/.X0-lock
-        '';
-
-      script = "${cfg.job.execCmd}";
-
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "200ms";
-        SyslogIdentifier = "display-manager";
-        # Stop restarting if the display manager stops (crashes) 2 times
-        # in one minute. Starting X typically takes 3-4s.
-        StartLimitInterval = "30s";
-        StartLimitBurst = "3";
-      };
-    };
+  # services.gnome.gnome-keyring.enable = true;
 }

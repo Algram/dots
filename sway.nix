@@ -28,6 +28,7 @@
       startup = [
         { command = "wal --theme /etc/nixos/dotfiles/colors.json -t -n -e"; }
         { command = "code --folder-uri ~/Dropbox/notes"; }
+        { command = "obsidian"; }
         { command = "dropbox"; }
         { command = "ydotoold"; }
         { command = "sh /etc/nixos/dotfiles/scripts/listener.sh"; }
@@ -85,6 +86,8 @@
 
           # Set the dpi to speed ratio (like mouse speed settings in windows)
           pointer_accel = "1";
+
+          natural_scroll = "enabled";
         };
       };
 
@@ -105,6 +108,10 @@
           mode = "2560x1440@143.912003Hz";
           transform = "270";
           pos = "0 0";
+        };
+
+        "HDMI-A-1" = {
+          scale = "1";
         };
       };
 
@@ -159,8 +166,8 @@
           "${modifier}+space" =
             "exec /etc/nixos/dotfiles/scripts/launcher.sh default";
           "Mod1+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
-          "Ctrl+space" =
-            "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
+          # "Ctrl+space" =
+          #   "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
           "Ctrl+Shift+space" = "exec clipman clear --all";
 
           # Umlauts
@@ -226,6 +233,7 @@
       }
 
       for_window [title="Notes"] move scratchpad, urgent disable
+      for_window [class="obsidian"] move scratchpad, urgent disable
 
       for_window [title=".*\(Private Browsing\).*"] move to workspace 999: media
       for_window [title="Wine System Tray"] kill

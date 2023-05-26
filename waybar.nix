@@ -43,13 +43,13 @@ in {
         };
 
         "custom/co2" = {
-          format = "煮 {} | ";
+          format = "煮 {} |";
           interval = 60;
           exec = "/etc/nixos/dotfiles/scripts/co2.sh";
         };
 
         "custom/radon" = {
-          format = " {} | ";
+          format = " {} |";
           interval = 60;
           exec = "/etc/nixos/dotfiles/scripts/radon.sh";
         };
@@ -88,6 +88,11 @@ in {
         min-height: 0;
         margin: 2px;
         font-weight: normal;
+      }
+
+      button {
+        padding: 0;
+        color: ${wal.special.foreground};
       }
 
       window#waybar {
