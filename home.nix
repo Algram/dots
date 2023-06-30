@@ -34,7 +34,10 @@ in {
         "wayland"; # https://github.com/emersion/xdg-desktop-portal-wlr/pull/11
     };
 
-    fonts.fontconfig.enable = true;
+      fonts.fontconfig.enable = true;
+  home.packages = [
+    (pkgs.nerdfonts.override { fonts = [ "RobotoMono" ]; })
+  ];
 
     gtk = {
       enable = true;

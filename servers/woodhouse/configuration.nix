@@ -22,8 +22,8 @@ in {
   services.openssh = {
     enable = true;
     settings = {
-      permitRootLogin = "no";
-      passwordAuthentication = false;
+      PermitRootLogin = "no";
+      PasswordAuthentication = false;
     };
   };
 
@@ -37,11 +37,19 @@ in {
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
 
+  services.cron = {
+    enable = false;
+    systemCronJobs = [
+      ''0 1 * * *     root   podman exec --user "$(id -u):$(id -g)" -it influxdb influx backup /home/influxdb/backup/ -t ${secrets.influxdb.admin.token}''
+    ];
+  };
+
   nixpkgs.config.allowUnfree = true;
 
-  services.unifi.enable = true;
+  services.unifi.enable = false;
   services.unifi.openPorts = false;
-  services.unifi.unifiPackage = pkgs.unifi7;
+  services.unifi.unifiPackage = pkgs.unifi;
+  # services.unifi.mongodbPackage = pkgs.mongodb-6_0;
 
   security.sudo = {
     enable = true;
@@ -88,7 +96,7 @@ in {
         start_type = "automatic";
         local_clientid = "openwb.mosquitto";
         try_private = false;
-        # cleansession = true; # Can lead to messages being retained more often
+        cleansession = false; # Can lead to messages being retained more often
       };
     };
 
@@ -102,7 +110,7 @@ in {
           token = secrets.influxdb.telegraf.energy.token;
           organization = secrets.influxdb.organization;
           name_override = "energy";
-          namepass = ["energy*"];
+          namepass = ["energy*" "pv*"];
         }
         {
           urls = [ "https://influxdb.${secrets.domain}" ];
@@ -120,6 +128,8 @@ in {
           data_format = "value";
           name_override = "energy";
           data_type = "float";
+          qos = 2;
+          persistent_session = true;
         }
         {
           servers = [ "tcp://127.0.0.1:1883" ];
@@ -127,6 +137,61 @@ in {
           client_id = "openwb-telegraf";
           data_format = "value";
           data_type = "float";
+          qos = 2;
+          persistent_session = true;
+        }
+      ];
+
+      inputs.http = [
+        {
+          # https://api.forecast.solar/estimate/:lat/:lon/:dec/:az/:kwp
+          urls = ["https://api.forecast.solar/estimate/watts/${secrets.forecast_solar.location}?time=utc"];
+          headers = {
+            accept = "text/csv";
+            "X-Delimiter" = "|";
+            "X-Separator" = ";";
+          };
+          data_format = "csv";
+          name_override = "pvForecastWatts";
+          interval = "3600s";
+          csv_header_row_count = 0;
+          csv_column_names = ["time" "value"];
+          csv_delimiter = ";";
+          csv_timestamp_column = "time";
+          csv_timestamp_format = "2006-01-02T15:04:05-07:00";
+        }
+        {
+          urls = ["https://api.forecast.solar/estimate/watthours/${secrets.forecast_solar.location}?time=utc"];
+          headers = {
+            accept = "text/csv";
+            "X-Delimiter" = "|";
+            "X-Separator" = ";";
+          };
+          data_format = "csv";
+          name_override = "pvForecastWattHours";
+          interval = "3600s";
+          csv_header_row_count = 0;
+          csv_column_names = ["time" "value"];
+          csv_delimiter = ";";
+          csv_timestamp_column = "time";
+          csv_timestamp_format = "2006-01-02T15:04:05-07:00";
+        }
+        {
+          urls = ["https://api.forecast.solar/estimate/watthours/day/${secrets.forecast_solar.location}?time=utc"];
+          headers = {
+            accept = "text/csv";
+            "X-Delimiter" = "|";
+            "X-Separator" = ";";
+          };
+          data_format = "csv";
+          name_override = "pvForecastWattHoursDay";
+          interval = "3600s";
+          csv_header_row_count = 0;
+          csv_column_names = ["time" "value"];
+          csv_column_types = [];
+          csv_delimiter = ";";
+          csv_timestamp_column = "time";
+          csv_timestamp_format = "2006-01-02T15:04:05-07:00";
         }
       ];
     };
@@ -145,7 +210,7 @@ in {
     containers.homeassistant = {
       volumes = [ "/home/woodhouse/hass:/config" ];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2023.4.6";
+      image = "ghcr.io/home-assistant/home-assistant:2023.6.3";
       extraOptions = [ 
         "--privileged"
         "--network=host"
@@ -170,7 +235,7 @@ in {
       environment.GF_AUTH_DISABLE_LOGIN_FORM = "true";
       environment.GF_AUTH_ANONYMOUS_ENABLED = "true";
       environment.GF_AUTH_ANONYMOUS_ORG_ROLE = "Admin";
-      image = "grafana/grafana-oss:9.4.3";
+      image = "grafana/grafana-oss:10.0.1";
       ports = [ "3000:3000" ];
       extraOptions = [ 
         "--network=host"
@@ -179,7 +244,7 @@ in {
     };
 
     containers.influxdb= {
-      volumes = [ "/home/woodhouse/influxdb/data:/var/lib/influxdb2" "/home/woodhouse/influxdb/config:/etc/influxdb2"];
+      volumes = [ "/home/woodhouse/influxdb/data:/var/lib/influxdb2" "/home/woodhouse/influxdb/config:/etc/influxdb2" "/home/woodhouse/influxdb/backup:/home/influxdb/backup"];
       environment = {
         TZ = "Europe/Berlin";
         DOCKER_INFLUXDB_INIT_MODE = "setup";
@@ -188,7 +253,7 @@ in {
         DOCKER_INFLUXDB_INIT_ORG = "home";
         DOCKER_INFLUXDB_INIT_BUCKET = "default";
       };
-      image = "influxdb:2.7.0";
+      image = "influxdb:2.7.1";
       ports = [ "8086:8086" ];
       extraOptions = [ 
         "--network=host"
@@ -343,7 +408,7 @@ in {
   networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 ];
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 ];
 
-  environment.systemPackages = with pkgs; [ vim zsh git netavark]; # netavark needed for podman at the moment
+  environment.systemPackages = with pkgs; [ rrsync  vim zsh git netavark]; # netavark needed for podman at the moment
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

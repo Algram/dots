@@ -31,8 +31,13 @@
     alsa-utils # For volume control script
     esphome
     libcec
+    arduino
+    platformio
     # esphome_pr
     # For pactl
+    gnome.gnome-control-center
+    ddcui
+    etcher
     pulseaudio
     pamixer # For volume control script
     ffmpeg-full

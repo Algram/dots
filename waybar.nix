@@ -37,19 +37,19 @@ in {
         };
 
         "custom/battery-mouse" = {
-          format = " {}";
+          format = "󰍽 {}";
           interval = 120;
           exec = "/etc/nixos/dotfiles/scripts/battery.sh";
         };
 
         "custom/co2" = {
-          format = "煮 {} |";
+          format = "󰟤 {} |";
           interval = 60;
           exec = "/etc/nixos/dotfiles/scripts/co2.sh";
         };
 
         "custom/radon" = {
-          format = " {} |";
+          format = "󱡝 {} |";
           interval = 60;
           exec = "/etc/nixos/dotfiles/scripts/radon.sh";
         };
@@ -83,7 +83,7 @@ in {
       * {
         border: none;
         border-radius: 0;
-        font-family: "Roboto Mono", Helvetica, Arial, sans-serif;
+        font-family: "Roboto Mono Nerd Font", "Roboto Mono", Helvetica, Arial, sans-serif;
         font-size: 15px;
         min-height: 0;
         margin: 2px;

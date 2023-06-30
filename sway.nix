@@ -3,14 +3,15 @@
     swaylock-fancy
     swayidle
     xwayland # for legacy apps
-    waybar # status bar
+    # waybar # status bar
     mako # notification daemon
     clipman
     wf-recorder
   ];
 
   wayland.windowManager.sway = {
-    enable = true;
+    enable = true;  
+    systemd.enable = true;
     wrapperFeatures.base = true;
     wrapperFeatures.gtk = true;
     extraSessionCommands = ''

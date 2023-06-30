@@ -142,7 +142,7 @@ in {
     enableDefaultFonts = true;
     fontDir.enable = true;
 
-    fonts = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) roboto roboto-mono noto-fonts noto-fonts-emoji ];
+    fonts = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) ];
 
     # fontconfig = {
     #   enable = true;
@@ -151,27 +151,28 @@ in {
     #   defaultFonts.monospace = [ "Roboto Mono" ];
     # };
 
-    fontconfig = {
-      # Fixes pixelation
-      antialias = true;
+      # fontconfig = {
+      #   # Fixes pixelation
+      #   antialias = true;
 
-      # Fixes antialiasing blur
-      hinting = {
-        enable = true;
-        style = "hintfull"; # no difference
-        autohint = true; # no difference
-      };
+      #   # Fixes antialiasing blur
+      #   hinting = {
+      #     enable = true;
+      #     style = "hintfull"; # no difference
+      #     autohint = true; # no difference
+      #   };
 
-      subpixel = {
-        # Makes it bolder
-        rgba = "rgb";
-        lcdfilter = "default"; # no difference
-      };
-    };
+      #   subpixel = {
+      #     # Makes it bolder
+      #     rgba = "rgb";
+      #     lcdfilter = "default"; # no difference
+      #   };
+      # };
   };
 
            nixpkgs.config.permittedInsecurePackages = [
                 "python-2.7.18.6"
+                "electron-12.2.3"
               ];
 
   services.printing.enable = true;
@@ -188,23 +189,29 @@ in {
         enable = true;
         settings = {
           screencast = {
-            
-            # output_name = "eDP-1";
-            max_fps = 30;
-            # exec_before = "pkill mako";
-            # exec_after = "mako";
-            chooser_type = "none";
-            output_name = "HDMI-A-1";
-
-          #             chooser_type = "simple";
-          # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+            chooser_type = "simple";
+            chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
           };
+        };
+        # settings = {
+        #   screencast = {
+            
+        #     # output_name = "eDP-1";
+        #     max_fps = 30;
+        #     # exec_before = "pkill mako";
+        #     # exec_after = "mako";
+        #     chooser_type = "none";
+        #     output_name = "HDMI-A-1";
+
+        #   #             chooser_type = "simple";
+        #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+        #   };
         #           screencast = { 
         #   max_fps = 30; 
         #   chooser_type = "simple";
         #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
         # };
-        };
+          # };
       };
       extraPortals = with pkgs; [
         xdg-desktop-portal-wlr
@@ -225,10 +232,13 @@ in {
   services.openssh = {
     enable = true;
     settings = {
-      permitRootLogin = "no";
-      passwordAuthentication = false;
+      PermitRootLogin = "no";
+      PasswordAuthentication = false;
     };
   };
+
+  hardware.i2c.enable = true;
+  services.ddccontrol.enable = true;
 
   services.gnome.gnome-settings-daemon = { enable = true; };
 
