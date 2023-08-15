@@ -8,7 +8,6 @@ let
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ./cachix.nix
   ];
 
   # Use the systemd-boot EFI boot loader.
@@ -16,8 +15,6 @@ in {
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = secrets.hostname;
-  networking.useDHCP = false;
-  networking.interfaces.enp0s25.useDHCP = true;
 
   services.openssh = {
     enable = true;
@@ -103,6 +100,9 @@ in {
   services.telegraf = {
     enable = true;
     extraConfig = {
+      agent = {
+        omit_hostname = true;
+      };
       outputs.influxdb_v2 = [
         {
           urls = [ "https://influxdb.${secrets.domain}" ];
@@ -118,6 +118,7 @@ in {
           namedrop = ["energy*" "pv*"];
           token = secrets.influxdb.telegraf.token;
           organization = secrets.influxdb.organization;
+
         }
       ];
 
@@ -225,7 +226,8 @@ in {
     #   enable = true;
     # };
     containers.homeassistant = {
-      volumes = [ "/home/woodhouse/hass:/config" ];
+      volumes = [ "/home/${secrets.username}/hass:/config" "/dev/serial/by-id:/dev/serial/by-id"];
+      # devices = [ "/dev/ttyUSB0:/dev/ttyUSB0" "/dev/ttyUSB1:/dev/ttyUSB1"];
       environment.TZ = "Europe/Berlin";
       image = "ghcr.io/home-assistant/home-assistant:2023.7.1";
       extraOptions = [ 
@@ -235,7 +237,7 @@ in {
     };
 
     containers.node-red = {
-      volumes = [ "/home/woodhouse/node-red:/data" ];
+      volumes = [ "/home/${secrets.username}/node-red:/data" ];
       environment.TZ = "Europe/Berlin";
       image = "nodered/node-red:3.0.2";
       ports = [ "1880:1880" ];
@@ -245,7 +247,7 @@ in {
     };
 
     containers.grafana = {
-      volumes = [ "/home/woodhouse/grafana:/var/lib/grafana" ];
+      volumes = [ "/home/${secrets.username}/grafana:/var/lib/grafana" ];
       environment.TZ = "Europe/Berlin";
       environment.GF_SERVER_DOMAIN = "grafana.${secrets.domain}";
       environment.GF_SECURITY_ALLOW_EMBEDDING = "true";
@@ -261,7 +263,7 @@ in {
     };
 
     containers.influxdb= {
-      volumes = [ "/home/woodhouse/influxdb/data:/var/lib/influxdb2" "/home/woodhouse/influxdb/config:/etc/influxdb2" "/home/woodhouse/influxdb/backup:/home/influxdb/backup"];
+      volumes = [ "/home/${secrets.username}/influxdb/data:/var/lib/influxdb2" "/home/${secrets.username}/influxdb/config:/etc/influxdb2" "/home/${secrets.username}/influxdb/backup:/home/influxdb/backup"];
       environment = {
         TZ = "Europe/Berlin";
         DOCKER_INFLUXDB_INIT_MODE = "setup";
@@ -273,6 +275,16 @@ in {
       image = "influxdb:2.7.1";
       ports = [ "8086:8086" ];
       extraOptions = [ 
+        "--network=host"
+      ];
+    };
+
+    containers.esphome = {
+      volumes = [ "/home/${secrets.username}/esphome:/config" ];
+      environment.TZ = "Europe/Berlin";
+      image = "esphome/esphome:latest";
+      extraOptions = [
+        "--privileged"
         "--network=host"
       ];
     };
@@ -334,6 +346,23 @@ in {
           proxyWebsockets = true;
         };
       };
+
+      virtualHosts."esphome.${secrets.domain}" =  {
+        useACMEHost = "esphome.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:6052";
+          proxyWebsockets = true;
+          # extraConfig = ''
+          #   proxy_set_header Host $host;
+          #   proxy_set_header X-Real-IP $remote_addr;
+          #   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          #   proxy_set_header X-Forwarded-Proto $scheme;
+          #   proxy_ssl_name $host;
+          #   proxy_ssl_server_name on;
+          # '';
+        };
+      };
   };
 
   security.acme = {
@@ -374,6 +403,14 @@ in {
   };
 
   security.acme.certs."unifi.${secrets.domain}" = {
+    domain = "*.${secrets.domain}";
+    group = "nginx";
+    dnsProvider = "cloudflare";
+    dnsResolver = "1.1.1.1:53";
+    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  };
+
+  security.acme.certs."esphome.${secrets.domain}" = {
     domain = "*.${secrets.domain}";
     group = "nginx";
     dnsProvider = "cloudflare";
@@ -422,10 +459,10 @@ in {
   services.logind.lidSwitch = "ignore";
 
   # 9522 for SMA Home Manager multicast messages
-  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 6052 ]; # 6052 for esphome
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 ];
 
-  environment.systemPackages = with pkgs; [ rrsync  vim zsh git netavark]; # netavark needed for podman at the moment
+  environment.systemPackages = with pkgs; [ rrsync  vim zsh git netavark powertop htop esphome ]; # netavark needed for podman at the moment
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -433,6 +470,6 @@ in {
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "21.05"; # Did you read the comment?
+  system.stateVersion = "23.05"; # Did you read the comment?
 }
 

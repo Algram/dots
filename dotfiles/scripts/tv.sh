@@ -33,8 +33,8 @@ if [ "$1" == "disable" ]; then
   # pkill -SIGINT obs
   pactl set-default-sink alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
 elif [ "$1" == "enable" ]; then
-  /nix/store/kpxc35wclp0rmd8w6gwnfdzhj8lpz7l7-xdg-desktop-portal-wlr-0.7.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
-  # /nix/store/8mz832r18lhr5dbr8b3djhhp5ypyb5yv-xdg-desktop-portal-wlr-0.6.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
+  # /nix/store/2572f7khdk9yj18h56igpl7g159isxw8-xdg-desktop-portal-wlr-0.7.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
+  # /nix/store/18mrryi6z1bw9yzgj3lrb9xbrgmm0pwa-xdg-desktop-portal-wlr-0.7.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
   sleep 1
 
   swaymsg output HDMI-A-1 enable

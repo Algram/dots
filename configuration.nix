@@ -139,10 +139,10 @@ in {
   };
 
   fonts = {
-    enableDefaultFonts = true;
+    enableDefaultPackages = true;
     fontDir.enable = true;
 
-    fonts = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) ];
+    packages = with pkgs; [ (nerdfonts.override { fonts = [ "RobotoMono" ]; }) ];
 
     # fontconfig = {
     #   enable = true;

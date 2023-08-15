@@ -85,7 +85,9 @@
     polkit
     polkit_gnome
     prusa-slicer
-    super-slicer-latest
+    # super-slicer-latest
+    cura
+    xdg-desktop-portal-wlr
     # pulseeffects-legacy
     pywal
     rrsync

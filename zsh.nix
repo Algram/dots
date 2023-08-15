@@ -13,6 +13,7 @@
       config = "code /etc/nixos";
       upgrade = "sudo nixos-rebuild switch --upgrade";
       upgrade-woodhouse = "terraform -chdir=/etc/nixos/servers/woodhouse plan && terraform -chdir=/etc/nixos/servers/woodhouse apply -auto-approve";
+      upgrade-barkley = "terraform -chdir=/etc/nixos/servers/barkley plan && terraform -chdir=/etc/nixos/servers/barkley apply -auto-approve";
       upgrade-local = "sudo nixos-rebuild switch -I nixpkgs=.";
       k = "kubectl";
     };

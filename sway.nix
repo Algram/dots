@@ -25,14 +25,16 @@
     '';
     config = {
       modifier = "Mod4";
+      floating.modifier = "Mod4";
 
       startup = [
         { command = "wal --theme /etc/nixos/dotfiles/colors.json -t -n -e"; }
-        { command = "code --folder-uri ~/Dropbox/notes"; }
+        # { command = "code --folder-uri ~/Dropbox/notes"; }
         { command = "obsidian"; }
         { command = "dropbox"; }
         { command = "ydotoold"; }
         { command = "sh /etc/nixos/dotfiles/scripts/listener.sh"; }
+        { command = "exec wl-paste -t text --watch clipman store"; }
         # {
         #   command = "pulseeffects --gapplication-service";
         # }
@@ -135,22 +137,25 @@
 
       keybindings =
         let modifier = config.wayland.windowManager.sway.config.modifier;
+        # let modifier = "Mod4";
         in lib.mkOptionDefault {
           "${modifier}+Return" = "exec kitty";
+          "${modifier}+t" = "exec kitty";
+          # "${modifier}+b" = "exec kitty";
           "${modifier}+1" = "workspace 1: web";
           "${modifier}+2" = "workspace 2: dev";
           "${modifier}+3" = "workspace 3: term";
           "${modifier}+4" = "workspace 4: social";
           "${modifier}+5" = "workspace 5: misc";
           "${modifier}+6" = "workspace 6: temp";
-          "${modifier}+Escape" = "workspace 999: media";
+          # "${modifier}+Escape" = "workspace 999: media";
           "${modifier}+Shift+1" = "move container to workspace 1: web";
           "${modifier}+Shift+2" = "move container to workspace 2: dev";
           "${modifier}+Shift+3" = "move container to workspace 3: term";
           "${modifier}+Shift+4" = "move container to workspace 4: social";
           "${modifier}+Shift+5" = "move container to workspace 5: misc";
           "${modifier}+Shift+6" = "move container to workspace 6: temp";
-          "${modifier}+Shift+Escape" = "move container to workspace 999: media";
+          # "${modifier}+Shift+Escape" = "move container to workspace 999: media";
           "XF86AudioLowerVolume" =
             "exec /etc/nixos/dotfiles/scripts/volume.sh down";
           "XF86AudioRaiseVolume" =
@@ -166,9 +171,8 @@
           # Launchers
           "${modifier}+space" =
             "exec /etc/nixos/dotfiles/scripts/launcher.sh default";
-          "Mod1+space" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
-          # "Ctrl+space" =
-          #   "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
+          "${modifier}+g" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
+          "${modifier}+b" = "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
           "Ctrl+Shift+space" = "exec clipman clear --all";
 
           # Umlauts
