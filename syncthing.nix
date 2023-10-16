@@ -2,7 +2,7 @@
 let secrets = import ./secrets.nix;
 in {
   services.syncthing = {
-    enable = true;
+    enable = false;
     relay.enable = false;
     user = secrets.username;
     dataDir = "/home/${secrets.username}/syncthing";

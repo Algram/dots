@@ -171,8 +171,9 @@ in {
   };
 
            nixpkgs.config.permittedInsecurePackages = [
-                "python-2.7.18.6"
-                "electron-12.2.3"
+                # "python-2.7.18.6"
+                "python-2.7.18.7"
+                "electron-19.1.9"
               ];
 
   services.printing.enable = true;

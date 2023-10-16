@@ -58,6 +58,7 @@ in {
     };
 
     services.kdeconnect.enable = false;
+    services.nextcloud-client.enable = false;
 
     programs.firefox = {
       enable = true;

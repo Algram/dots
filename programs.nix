@@ -85,7 +85,7 @@
     polkit
     polkit_gnome
     prusa-slicer
-    # super-slicer-latest
+    super-slicer-latest
     cura
     xdg-desktop-portal-wlr
     # pulseeffects-legacy
@@ -95,7 +95,8 @@
     slurp
     sox
     spotify
-    kicad
+    # kicad
+    nextcloud-client
     sshfs
     scrcpy
     swappy
