@@ -1,5 +1,12 @@
 { config, pkgs, ... }:
-{
+let
+  nix-software-center = import (pkgs.fetchFromGitHub {
+    owner = "vlinkz";
+    repo = "nix-software-center";
+    rev = "0.1.2";
+    sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
+  }) {};
+in {
   nixpkgs.config = {
     allowUnfree = true;
     chromium.enableWideVine = true;
@@ -15,17 +22,23 @@
     };
   };
 
+  programs.java = { enable = true; };
+
+  services.accounts-daemon.enable = true;
+  services.gnome.gnome-online-accounts.enable = true;
+
   environment.systemPackages = with pkgs; [
+    # nix-software-center
     qt5.qtwayland
     # For vscode nix file formatting
-    nixfmt
+    # nixfmt
     # playwright
     #  playwright.browsers
     terraform
     (pkgs.steam.override { extraLibraries = pkgs: [ pkgs.pipewire ]; })
     appimage-run
     ddccontrol
-    dfeet
+    d-spy
     discord
     dropbox
     alsa-utils # For volume control script
@@ -33,29 +46,39 @@
     libcec
     arduino
     platformio
+    xournalpp
+    inkscape
+    # orca-slicer
+    evolution
     # esphome_pr
     # For pactl
-    gnome.gnome-control-center
+    gnome-control-center
     ddcui
-    etcher
+    mediawriter
     pulseaudio
     pamixer # For volume control script
     ffmpeg-full
-    alsaLib
+    alsa-lib
     firefox-wayland
+    # (firefox-wayland.override { cfg.enableKeePassXC = true; })
     gimp
     git
     glib
-    gnome.adwaita-icon-theme
-    gnome.evince
-    gnome.file-roller
-    gnome.gedit
-    gnome.gnome-disk-utility
-    gnome.gnome-keyring
-    gnome.seahorse
-    gnome.gnome-logs
-    gnome.gnome-system-monitor
-    gnome.nautilus
+    adwaita-icon-theme
+    evince
+    file-roller
+    gedit
+    gnome-disk-utility
+    gnome-keyring
+    seahorse
+    gnome-logs
+    nix-output-monitor
+    # blender
+    xorg.xrandr # needed for xrandr --output DP-1 --primary
+    gnome-system-monitor
+    nautilus
+    gnome-calendar
+    planify
     shotwell
     gnupg
     gopass
@@ -81,12 +104,12 @@
     networkmanagerapplet
     nfs-utils
     pavucontrol
-    pinentry-gnome
+    # pinentry-gnome
     polkit
     polkit_gnome
-    prusa-slicer
+    # prusa-slicer
     super-slicer-latest
-    cura
+    sov
     xdg-desktop-portal-wlr
     # pulseeffects-legacy
     pywal
@@ -120,9 +143,16 @@
     # hyperhdr
     pika-backup
     drawing
-    element-desktop-wayland
+    # element-desktop-wayland
     element-web
     obsidian
     appimage-run
+    cheese
+    ipmitool
+    # minecraft
+    prismlauncher
+    # gnome.mission-control
+    # pass-wayland
+    keepmenu
   ];
 }

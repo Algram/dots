@@ -9,7 +9,7 @@ in {
   imports = [
     ./hardware-configuration.nix # Include the results of the hardware scan.
     ./loginManager.nix
-    ./home.nix
+    # ./home.nix
     ./zsh.nix
     ./programs.nix
     ./work.nix
@@ -17,13 +17,10 @@ in {
     ./syncthing.nix
     ./mounts.nix
     ./virtualization.nix
+    ./systemd.nix
   ];
 
-  nix = {
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-   };
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   boot = {
     # Use the systemd-boot EFI boot loader.
@@ -66,7 +63,7 @@ in {
   };
 
   hardware = {
-    opengl = {
+    graphics = {
       enable = true;
       extraPackages = with pkgs; [
         vaapiVdpau
@@ -74,11 +71,12 @@ in {
       ];
 
       # Needed for Steam
-      driSupport = true;
-      driSupport32Bit = true;
+      # driSupport = true;
+      # driSupport32Bit = true;
     };
 
     # Replaced by pipewire
+    # Pulseaudio needed for PS4 bluetooth controller
     pulseaudio.enable = false;
     pulseaudio.support32Bit = true;
   };
@@ -86,10 +84,11 @@ in {
   hardware.openrazer = {
     enable = true;
     users = [ secrets.username ];
+    batteryNotifier.enable = false;
   };
 
-  hardware.bluetooth.enable = true;
-  services.blueman.enable = true;
+  # hardware.bluetooth.enable = true;
+  # services.blueman.enable = true;
 
   hardware.enableRedistributableFirmware = true;
 
@@ -174,6 +173,10 @@ in {
                 # "python-2.7.18.6"
                 "python-2.7.18.7"
                 "electron-19.1.9"
+                "electron-25.9.0"
+                "python-2.7.18.8"
+                "python3.12-youtube-dl-2021.12.17"
+                "jitsi-meet-1.0.8043"
               ];
 
   services.printing.enable = true;
@@ -181,7 +184,7 @@ in {
   services.avahi.enable = true;
   # Important to resolve .local domains of printers, otherwise you get an error
   # like  "Impossible to connect to XXX.local: Name or service not known"
-  services.avahi.nssmdns = true;
+  services.avahi.nssmdns4 = true;
 
   # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
   xdg.portal = {
@@ -253,7 +256,7 @@ in {
 
   programs.gnupg.agent = {
     enable = true;
-    pinentryFlavor = "gnome3";
+    pinentryPackage = pkgs.pinentry-gnome3;
   };
 
   environment.variables = {
@@ -272,6 +275,15 @@ in {
 
   # Needed for login manager session file
   programs.sway.enable = true;
+  programs.sway.package = null;
+
+
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true;
+  services.blueman.enable = true;
+    hardware.bluetooth.package = pkgs.bluez.overrideAttrs (oldAttrs: {
+    configureFlags = oldAttrs.configureFlags ++ [ "--enable-sixaxis" ];
+  });
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

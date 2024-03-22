@@ -29,6 +29,7 @@ if [ "$1" == "disable" ]; then
   # pkill -SIGINT hyperiond
   pkill -SIGINT hyperhdr
   swaymsg "[workspace=1]" move workspace to output DP-1
+  sleep 1
   swaymsg output HDMI-A-1 disable
   # pkill -SIGINT obs
   pactl set-default-sink alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
@@ -38,6 +39,7 @@ elif [ "$1" == "enable" ]; then
   sleep 1
 
   swaymsg output HDMI-A-1 enable
+  sleep 1
   swaymsg "[workspace=1]" move workspace to output HDMI-A-1
   sleep 1
   # Output file "/dev/video9" exists. Overwrite? Y/n:

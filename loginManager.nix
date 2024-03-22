@@ -1,4 +1,6 @@
-{ config, pkgs, lib, ... }: {
+{ config, pkgs, lib, ... }:
+let secrets = import ./secrets.nix;
+in {
   # services.xserver.enable = true;
   # services.xserver.displayManager.defaultSession = "sway";
   # services.xserver.displayManager.lightdm = {
@@ -86,15 +88,17 @@
   #     };
   #   };
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.defaultSession = "sway";
-  services.xserver.displayManager.lightdm = {
-    enable = true;
-    greeters.pantheon.enable = true;
-  };
-  services.xserver.libinput.enable = true;
-  services.xserver.layout = "us";
-  services.xserver.dpi = 96;
+  # services.xserver.enable = true;
+  # services.displayManager.defaultSession = "sway";
+  # services.displayManager.autoLogin.enable = true;
+  # services.displayManager.autoLogin.user = secrets.username;
+  # services.displayManager.lightdm = {
+  #   enable = true;
+  #   greeters.pantheon.enable = true;
+  # };
+  # services.libinput.enable = true;
+  # services.xserver.xkb.layout = "us";
+  # services.xserver.dpi = 96;
 
-  # services.gnome.gnome-keyring.enable = true;
+  services.gnome.gnome-keyring.enable = true;
 }

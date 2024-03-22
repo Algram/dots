@@ -37,6 +37,8 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   networking.hostName = secrets.hostname;
 
   services.openssh = {
@@ -53,7 +55,7 @@ in {
   users.users.${secrets.username} = {
     isNormalUser = true;
     home = "/home/${secrets.username}";
-    extraGroups = [ "wheel" "docker" ];
+    extraGroups = [ "wheel" "docker" "postgres" ];
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
 
@@ -67,7 +69,7 @@ in {
   nixpkgs.config.allowUnfree = true;
 
   services.unifi.enable = false;
-  services.unifi.openPorts = false;
+  services.unifi.openFirewall = false;
   services.unifi.unifiPackage = pkgs.unifi;
   # services.unifi.mongodbPackage = pkgs.mongodb-6_0;
 
@@ -111,12 +113,28 @@ in {
       addresses = [
         { address = "192.168.1.253"; port = 1883; }
       ];
-      topics = [ "openWB/# both 2"];
+      topics = [
+        "openWB/set/vehicle/template/charge_template/+/chargemode/selected out"
+
+        "openWB/chargepoint/1/get/connected_vehicle/config in"
+        "openWB/chargepoint/1/get/connected_vehicle/info in"
+        "openWB/chargepoint/1/get/# in"
+        "openWB/chargepoint/1/config in"
+        "openWB/chargepoint/1/get/+ in"
+        "openWB/chargepoint/1/get/connected_vehicle/soc in"
+
+        "openWB/chargepoint/2/get/connected_vehicle/config in"
+        "openWB/chargepoint/2/get/connected_vehicle/info in"
+        "openWB/chargepoint/2/get/# in"
+        "openWB/chargepoint/2/config in"
+        "openWB/chargepoint/2/get/+ in"
+        "openWB/chargepoint/2/get/connected_vehicle/soc in"
+      ];
       settings = {
         start_type = "automatic";
         local_clientid = "openwb.mosquitto";
-        try_private = false;
-        cleansession = true; # Can lead to messages being retained more often
+        # try_private = true;
+        # cleansession = true; # Can lead to messages being retained more often
       };
     };
 
@@ -135,14 +153,14 @@ in {
           name_override = "energy";
           namepass = ["energy*" "pv*"];
         }
-        {
-          urls = [ "https://influxdb.${secrets.domain}" ];
-          bucket = "openwb";
-          namedrop = ["energy*" "pv*"];
-          token = secrets.influxdb.telegraf.token;
-          organization = secrets.influxdb.organization;
+        # {
+        #   urls = [ "https://influxdb.${secrets.domain}" ];
+        #   bucket = "openwb";
+        #   namedrop = ["energy*" "pv*"];
+        #   token = secrets.influxdb.telegraf.token;
+        #   organization = secrets.influxdb.organization;
 
-        }
+        # }
       ];
 
       inputs.mqtt_consumer = [
@@ -156,23 +174,23 @@ in {
           qos = 2;
           persistent_session = true;
         }
-        {
-          servers = [ "tcp://127.0.0.1:1883" ];
-          topics = [
-            "openWB/global/ChargeMode"
-            "openWB/global/WHouseConsumption"
-            "openWB/global/WAllChargePoints"
-            "openWB/global/DailyYieldHausverbrauchKwh"
-            "openWB/global/DailyYieldAllChargePointsKwh"
-            "openWB/global/kWhCounterAllChargePoints"
-            "openWB/global/strLastmanagementActive"
-          "openWB/evu/#" "openWB/lp/#" "openWB/pv/#" "openWB/SmartHome/#"];
-          # client_id = "openwb-telegraf";
-          data_format = "value";
-          data_type = "float";
-          # qos = 2;
-          # persistent_session = true;
-        }
+        # {
+        #   servers = [ "tcp://192.168.1.253:1883" ];
+        #   topics = [
+        #     "openWB/global/ChargeMode"
+        #     "openWB/global/WHouseConsumption"
+        #     "openWB/global/WAllChargePoints"
+        #     "openWB/global/DailyYieldHausverbrauchKwh"
+        #     "openWB/global/DailyYieldAllChargePointsKwh"
+        #     "openWB/global/kWhCounterAllChargePoints"
+        #     "openWB/global/strLastmanagementActive"
+        #   "openWB/evu/#" "openWB/lp/#" "openWB/chargepoint/#" "openWB/bat/#" "openWB/pv/#" "openWB/SmartHome/#"];
+        #   # client_id = "openwb-telegraf";
+        #   data_format = "value";
+        #   data_type = "float";
+        #   # qos = 2;
+        #   # persistent_session = true;
+        # }
       ];
 
       inputs.http = [
@@ -249,10 +267,13 @@ in {
     #   enable = true;
     # };
     containers.homeassistant = {
-      volumes = [ "/home/${secrets.username}/hass:/config" "/dev/serial/by-id:/dev/serial/by-id"];
+      volumes = [ 
+        "/home/${secrets.username}/hass:/config"
+        # "/dev/serial/by-id:/dev/serial/by-id"
+      ];
       # devices = [ "/dev/ttyUSB0:/dev/ttyUSB0" "/dev/ttyUSB1:/dev/ttyUSB1"];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2023.8.1";
+      image = "ghcr.io/home-assistant/home-assistant:2024.11";
       extraOptions = [ 
         "--privileged"
         "--network=host"
@@ -262,7 +283,7 @@ in {
     containers.node-red = {
       volumes = [ "/home/${secrets.username}/node-red:/data" ];
       environment.TZ = "Europe/Berlin";
-      image = "nodered/node-red:3.0.2";
+      image = "nodered/node-red:3.1.3";
       ports = [ "1880:1880" ];
       extraOptions = [ 
         "--network=host"
@@ -277,7 +298,7 @@ in {
       environment.GF_AUTH_DISABLE_LOGIN_FORM = "true";
       environment.GF_AUTH_ANONYMOUS_ENABLED = "true";
       environment.GF_AUTH_ANONYMOUS_ORG_ROLE = "Admin";
-      image = "grafana/grafana-oss:10.0.3";
+      image = "grafana/grafana-oss:10.2.3";
       ports = [ "3000:3000" ];
       extraOptions = [ 
         "--network=host"
@@ -302,15 +323,15 @@ in {
       ];
     };
 
-    # containers.esphome = {
-    #   volumes = [ "/home/${secrets.username}/esphome:/config" ];
-    #   environment.TZ = "Europe/Berlin";
-    #   image = "esphome/esphome:latest";
-    #   extraOptions = [
-    #     "--privileged"
-    #     "--network=host"
-    #   ];
-    # };
+    containers.esphome = {
+      volumes = [ "/home/${secrets.username}/esphome:/config" ];
+      environment.TZ = "Europe/Berlin";
+      image = "esphome/esphome:2024.5";
+      extraOptions = [
+        "--privileged"
+        "--network=host"
+      ];
+    };
 
     containers.paperless-ngx= {
       volumes = [
@@ -335,26 +356,135 @@ in {
         USERMAP_GID = "315";
         PAPERLESS_URL = "https://paperless.${secrets.domain}"; 
       };
-      image = "ghcr.io/paperless-ngx/paperless-ngx:dev";
+      image = "ghcr.io/paperless-ngx/paperless-ngx:2.11.3";
       ports = [ "8000:8000" ];
       extraOptions = [ 
+        "--privileged"
+        "--network=host"
+      ];
+    };
+
+    containers.excalidraw = {
+      image = "excalidraw/excalidraw:latest";
+      ports = [ "5000:80" ];
+    };
+
+    containers.nextcloud-aio-mastercontainer = {
+      volumes = [
+        "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
+        "nextcloud_aio_mastercontainer:/mnt/docker-aio-config"
+      ];
+      environment = {
+        NEXTCLOUD_DATADIR = "/home/barkley/nextcloud-aio";
+      };
+      image = "nextcloud/all-in-one:latest";
+      ports = [ "1080:80" "2080:8080" "2443:8443"];
+      extraOptions = [ 
+        "--privileged"
+        # "--network=host"
+      ];
+    };
+
+    containers.watcharr = {
+      volumes = [ "/home/${secrets.username}/watcharr:/data" ];
+      image = "ghcr.io/sbondco/watcharr:latest";
+      ports = [ "3080:3080" ];
+    };
+
+    containers.matter-server = {
+      volumes = [ "/home/${secrets.username}/matter-server:/data" ];
+      image = "ghcr.io/home-assistant-libs/python-matter-server:stable";
+      extraOptions = [
+        "--security-opt=apparmor=unconfined"
+        "--network=host"
+      ];
+    };
+    
+    # containers.ser2net = {
+    #   volumes = [ "/home/${secrets.username}/ser2net:/data" ];
+    #   image = "ghcr.io/jippi/docker-ser2net";
+    #   extraOptions = [
+    #     "--security-opt=apparmor=unconfined"
+    #     "--network=host"
+    #   ];
+    # };
+    
+    # TODO make var lib docker or so persisted
+    # containers.otbr = {
+    #   image = "openthread/otbr";
+    #   volumes = [ "/home/barkley/ttyOTBR:/tmp/ttyOTBR" "/home/barkley/otbr/thread:/var/lib/thread" ];
+    #   ports = [ "8081:80" "3081:8081"];
+    #   # cmd = [
+    #   #   "--radio-url spinel+hdlc+uart:///dev/ttyUSB1?uart-baudrate=460800"
+    #   # ];
+    #   environment = {
+    #     RADIO_URL = "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-flow-control";
+    #     TREL_URL = "trel://enp0s31f6";
+    #     DHCPV6_PD_REF = "0";        
+    #   };
+    #   extraOptions = [
+    #     ''--sysctl=net.ipv6.conf.all.disable_ipv6=0''
+    #     ''--sysctl=net.ipv4.conf.all.forwarding=1''
+    #     ''--sysctl=net.ipv6.conf.all.forwarding=1''
+    #     # ''--sysctl=net.ipv6.conf.all.accept_ra_rt_info_max_plen=64''
+    #     # ''--sysctl=net.ipv6.conf.all.accept_ra=2''
+    #     "--privileged"
+    #     "--dns=127.0.0.1"
+    #     # "--network=host"
+    #   ];
+    # };
+
+    containers.music-assistant = {
+      volumes = [ "/home/${secrets.username}/music-assistant:/data" ];
+      image = "ghcr.io/music-assistant/server";
+      extraOptions = [
+        "--cap-add=DAC_READ_SEARCH"
+        "--cap-add=SYS_ADMIN"
+        "--security-opt=apparmor=unconfined"
         "--network=host"
       ];
     };
   };
 
-  services.redis.servers."paperless-ngx-redis".enable = true;
-  services.redis.servers."paperless-ngx-redis".port = 6379;
+  # For Linux and without a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else) already in place:
+# sudo docker run \
+# --init \
+# --sig-proxy=false \
+# --name nextcloud-aio-mastercontainer \
+# --restart always \
+# --publish 80:80 \
+# --publish 8080:8080 \
+# --publish 8443:8443 \
+# --volume nextcloud_aio_mastercontainer:/mnt/docker-aio-config \
+# --volume /var/run/docker.sock:/var/run/docker.sock:ro \
+# nextcloud/all-in-one:latest
+
+  services.redis.servers."paperless-ngx".enable = true;
+  services.redis.servers."paperless-ngx".port = 6379;
 
   services.tailscale.enable = true;
   services.tailscale.useRoutingFeatures = "both";
 
   services.nextcloud = {
     enable = true;
+    package = pkgs.nextcloud30;
     hostName = "nextcloud.${secrets.domain}";
     https = true;
     configureRedis = true;
     datadir = "/mnt/nextcloud";
+    maxUploadSize = "16G";
+
+    # extraApps = {
+    #   inherit (config.services.nextcloud.package.packages.apps) files_retention;
+    # };
+
+    caching = {
+      redis = true;
+      memcached = true;
+      apcu = true;
+    };
+
+    fastcgiTimeout = 300;
 
     database.createLocally = true;
     config = {
@@ -362,7 +492,106 @@ in {
       dbtype = "pgsql";
     };
 
-    phpOptions."opcache.interned_strings_buffer" = "24";
+    settings = {
+      memcache.local = "\\OC\Memcache\\APCu";
+      memcache.distributed = "\\OC\\Memcache\\Redis";
+      memcache.locking = "\\OC\Memcache\\Redis";
+      default_phone_region = "DE";
+      maintenance_window_start = 2; # 02:00 
+      dbpersistent = false;
+      redis = {
+        host = "/run/redis-nextcloud/redis.sock";
+        port = 0;
+        dbindex = 0;
+        # password = "secret";
+        timeout = 1.5;
+      };
+      preview_imaginary_url = "https://imaginary.raphael.sh";
+      # enabledPreviewProviders = [
+      #   "OC\\Preview\\MP3"
+      #   "OC\\Preview\\TXT"
+      #   "OC\\Preview\\MarkDown"
+      #   "OC\\Preview\\OpenDocument"
+      #   "OC\\Preview\\Krita"
+      #   # "OC\\Preview\\Imaginary"
+      # ];
+
+      enabledPreviewProviders = [
+    "OC\\Preview\\BMP"
+    "OC\\Preview\\GIF"
+    "OC\\Preview\\JPEG"
+    "OC\\Preview\\Krita"
+    "OC\\Preview\\MarkDown"
+    "OC\\Preview\\MP3"
+    "OC\\Preview\\OpenDocument"
+    "OC\\Preview\\PNG"
+    "OC\\Preview\\TXT"
+    "OC\\Preview\\XBitmap"
+    "OC\\Preview\\HEIC"
+  ];
+
+          trusted_domains = [
+        "nextcloud.raphael.sh"
+        "imaginary.raphael.sh"
+      ];
+    };
+
+    phpOptions."opcache.interned_strings_buffer" = "80";
+    phpOptions."opcache.memory_consumption" = "512";
+    phpOptions."max_chunk_size" = "20971520";
+    phpOptions."max_input_time" = "3600";
+    phpOptions."upload_max_filesize" = "16G";
+    phpOptions."post_max_size" = "16G";
+    phpOptions."upload_tmp_dir" = "/home/barkley/nextcloud-upload-temp";
+
+    poolSettings = {
+        "pm" = "dynamic";
+        "pm.max_children" = "300";
+        "pm.start_servers" = "50";
+        "pm.min_spare_servers" = "50";
+        "pm.max_spare_servers" = "250";
+        "pm.max_requests" = "500";
+    };
+  };
+
+  services.mysql = {
+    enable = true;
+    # dataDir = "/data/mysql";
+    package = pkgs.mariadb;
+    ensureDatabases = [ "pp" ];
+    ensureUsers = [ {
+      name = "photoprism";
+      ensurePermissions = {
+        "pp.*" = "ALL PRIVILEGES";
+      };
+    } ];
+  };
+
+  services.photoprism = {
+    enable = true;
+    port = 2342;
+    originalsPath = "/mnt/photoprism/data/raphael/files/phone_upload/Camera";
+    address = "0.0.0.0";
+    settings = {
+      PHOTOPRISM_ADMIN_USER = "admin";
+      PHOTOPRISM_ADMIN_PASSWORD = "1234";
+      PHOTOPRISM_DEFAULT_LOCALE = "en";
+      PHOTOPRISM_DATABASE_DRIVER = "mysql";
+      PHOTOPRISM_DATABASE_NAME = "pp";
+      PHOTOPRISM_DATABASE_SERVER = "/run/mysqld/mysqld.sock";
+      PHOTOPRISM_DATABASE_USER = "photoprism";
+      PHOTOPRISM_DATABASE_PASSWORD = "1234";
+      PHOTOPRISM_SITE_URL = "https://photoprism.raphael.sh";
+      PHOTOPRISM_SITE_TITLE = "My PhotoPrism";
+      PHOTOPRISM_READ_ONLY = "true";
+      PHOTOPRISM_INDEX_SCHEDULE = "*/10 * * * *";
+    };
+  };
+
+  services.imaginary = {
+    enable = false;
+
+    settings.return-size = true;
   };
 
   fileSystems."/mnt/nextcloud" = {
@@ -376,6 +605,30 @@ in {
     # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
     # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
   };
+
+  fileSystems."/mnt/photoprism" = {
+    device = "//192.168.1.150/nextcloud";
+    fsType = "cifs";
+    options = let
+      # this line prevents hanging on network split
+      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+
+    in ["${automount_opts},username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},mfsymlinks,file_mode=0555,dir_mode=0555"];
+    # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
+    # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
+  };
+
+  # fileSystems."/mnt/paperless" = {
+  #   device = "//192.168.1.150/paperless";
+  #   fsType = "cifs";
+  #   options = let
+  #     # this line prevents hanging on network split
+  #     automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+
+  #   in ["${automount_opts},username=${secrets.paperless.samba.username},password=${secrets.paperless.samba.password},uid=315,gid=315,mfsymlinks,file_mode=0770,dir_mode=0770"];
+  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
+  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
+  # };
 
   fileSystems."/mnt/paperless" = {
     device = "192.168.1.150:/mnt/data/paperless";
@@ -421,7 +674,7 @@ in {
       recommendedTlsSettings = true;
       # other Nginx options
       virtualHosts."home.${secrets.domain}" =  {
-        useACMEHost = "home.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:8123";
@@ -437,7 +690,7 @@ in {
 
       # systemctl status acme-node-red.${secrets.domain}.service
       virtualHosts."node-red.${secrets.domain}" =  {
-        useACMEHost = "node-red.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:1880";
@@ -445,8 +698,44 @@ in {
         };
       };
 
+      virtualHosts."imaginary.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8088";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."photoprism.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:2342";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."watcharr.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3080";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."otbr.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:3081";
+          proxyWebsockets = true;
+        };
+      };
+
       virtualHosts."influxdb.${secrets.domain}" =  {
-        useACMEHost = "influxdb.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:8086";
@@ -463,17 +752,26 @@ in {
         };
       };
 
-      virtualHosts."unifi.${secrets.domain}" =  {
-        useACMEHost = "unifi.${secrets.domain}";
+      virtualHosts."excalidraw.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
-          proxyPass = "https://127.0.0.1:8443";
+          proxyPass = "http://127.0.0.1:5000";
           proxyWebsockets = true;
         };
       };
 
+      # virtualHosts."unifi.${secrets.domain}" =  {
+      #   useACMEHost = "unifi.${secrets.domain}";
+      #   forceSSL = true;
+      #   locations."/" = {
+      #     proxyPass = "https://127.0.0.1:8443";
+      #     proxyWebsockets = true;
+      #   };
+      # };
+
       virtualHosts."esphome.${secrets.domain}" =  {
-        useACMEHost = "esphome.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:6052";
@@ -490,7 +788,7 @@ in {
       };
 
       virtualHosts."nas.${secrets.domain}" =  {
-        useACMEHost = "nas.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "https://192.168.1.150:443";
@@ -498,13 +796,31 @@ in {
         };
       };
 
+      virtualHosts."3d.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://192.168.1.151:80";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."wallbox.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://192.168.1.253:80";
+          proxyWebsockets = true;
+        };
+      };
+
       virtualHosts."nextcloud.${secrets.domain}" =  {
         forceSSL = true;
-        useACMEHost = "nextcloud.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
       };
 
       virtualHosts."paperless.${secrets.domain}" =  {
-        useACMEHost = "paperless.${secrets.domain}";
+        useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           # proxyPass = "http://127.0.0.1:28981";
@@ -519,53 +835,69 @@ in {
     defaults.email = "aliasgram@gmail.com";
   };
 
-  security.acme.certs."nas.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."nas.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
-  security.acme.certs."nextcloud.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."3d.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
+  
+  # security.acme.certs."wallbox.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
-  security.acme.certs."paperless.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."nextcloud.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
-  security.acme.certs."home.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."paperless.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
-  security.acme.certs."node-red.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."home.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
-  security.acme.certs."influxdb.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."node-red.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
+
+  # security.acme.certs."influxdb.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
   security.acme.certs."grafana.${secrets.domain}" = {
     domain = "*.${secrets.domain}";
@@ -575,7 +907,7 @@ in {
     credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
   };
 
-  security.acme.certs."unifi.${secrets.domain}" = {
+  security.acme.certs."${secrets.domain}" = {
     domain = "*.${secrets.domain}";
     group = "nginx";
     dnsProvider = "cloudflare";
@@ -583,13 +915,13 @@ in {
     credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
   };
 
-  security.acme.certs."esphome.${secrets.domain}" = {
-    domain = "*.${secrets.domain}";
-    group = "nginx";
-    dnsProvider = "cloudflare";
-    dnsResolver = "1.1.1.1:53";
-    credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  };
+  # security.acme.certs."esphome.${secrets.domain}" = {
+  #   domain = "*.${secrets.domain}";
+  #   group = "nginx";
+  #   dnsProvider = "cloudflare";
+  #   dnsResolver = "1.1.1.1:53";
+  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
+  # };
 
   programs.zsh = {
     enable = true;
@@ -611,15 +943,15 @@ in {
 
   services.tlp = {
     enable = true;
-    extraConfig = ''
-      CPU_SCALING_GOVERNOR_ON_AC=powersave
-      CPU_SCALING_GOVERNOR_ON_BAT=powersave
-      CPU_MAX_PERF_ON_AC=30
-      CPU_MAX_PERF_ON_BAT=30
-    '';
+    settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "powersave";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_MAX_PERF_ON_AC = 30;
+      CPU_MAX_PERF_ON_BAT = 30;
+    };
   };
 
-  nix.autoOptimiseStore = true;
+  nix.settings.auto-optimise-store = true;
 
   nix.gc = {
     automatic = true;
@@ -631,11 +963,11 @@ in {
 
   services.logind.lidSwitch = "ignore";
 
-  # 9522 for SMA Home Manager multicast messages
-  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 6052 28981 5201]; # 6052 for esphome, 28981 for paperless
-  networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 5201 ];
+  # 9522 for SMA Home Manager multicast messages "1080:80" "2080:8080" "2443:8443"
+  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 6052 28981 5201 8088 8000 1080 2080 2443 8081 8095 3483 9000 9090 8097 8098]; # 6052 for esphome, 28981 for paperless, 8088 for imaginary
+  networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 5201 4003 8095 3483 9000 9090 8097 8098 ]; # 4003 govee lan local
 
-  environment.systemPackages = with pkgs; [ rrsync  vim zsh git netavark powertop htop esphome samba zxing zxing-cpp python311Packages.zxing_cpp ]; # netavark needed for podman at the moment
+  environment.systemPackages = with pkgs; [ php rrsync  vim zsh git netavark powertop htop esphome samba zxing zxing-cpp python311Packages.zxing_cpp ustreamer ]; # netavark needed for podman at the moment
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
