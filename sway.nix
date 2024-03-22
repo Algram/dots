@@ -32,6 +32,8 @@
         # { command = "code --folder-uri ~/Dropbox/notes"; }
         { command = "obsidian"; }
         { command = "dropbox"; }
+        { command = "nextcloud --background"; }
+        { command = "keepassxc"; }
         { command = "ydotoold"; }
         { command = "sh /etc/nixos/dotfiles/scripts/listener.sh"; }
         { command = "exec wl-paste -t text --watch clipman store"; }
@@ -169,7 +171,7 @@
           "${modifier}+l" = "exec swaylock-fancy -e -t ''";
 
           # Launchers
-          "${modifier}+space" =
+          "${modifier}+p" =
             "exec /etc/nixos/dotfiles/scripts/launcher.sh default";
           "${modifier}+g" = "exec /etc/nixos/dotfiles/scripts/launcher.sh gopass";
           "${modifier}+b" = "exec /etc/nixos/dotfiles/scripts/launcher.sh clipboard";
@@ -232,13 +234,14 @@
       set $gnome-schema org.gnome.desktop.interface
 
       exec_always {
-          gsettings set $gnome-schema gtk-theme 'Materia-dark-compact'
+          gsettings set $gnome-schema gtk-theme 'Pop-dark'
           gsettings set $gnome-schema icon-theme 'Papirus-Dark'
           gsettings set $gnome-schema cursor-theme 'Adwaita'
       }
 
       for_window [title="Notes"] move scratchpad, urgent disable
       for_window [class="obsidian"] move scratchpad, urgent disable
+      for_window [app_id="org.keepassxc.KeePassXC"] move scratchpad, urgent disable
 
       for_window [title=".*\(Private Browsing\).*"] move to workspace 999: media
       for_window [title="Wine System Tray"] kill

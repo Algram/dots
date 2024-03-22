@@ -52,18 +52,28 @@ in {
         package = pkgs.papirus-icon-theme;
       };
       theme = {
-        name = "Materia-dark-compact";
-        package = pkgs.materia-theme;
+        name = "Pop-dark";
+        package = pkgs.pop-gtk-theme;
       };
     };
 
     services.kdeconnect.enable = false;
     services.nextcloud-client.enable = false;
 
+    # services.gnome-keyring = {
+    #   enable = true;
+
+    # };
+
     programs.firefox = {
       enable = true;
       # Until https://github.com/nix-community/home-manager/issues/1641 is fixed
       package = pkgs.firefox-wayland;
+
+      nativeMessagingHosts = [
+        pkgs.keepassxc
+        # pkgs.keepassxc-proxy
+      ];
 
       profiles.default = {
         path = "1utyytkx.default";
@@ -79,7 +89,7 @@ in {
     };
 
     services.gammastep = {
-      enable = false;
+      enable = true;
       # Berlin coordinates
       latitude = "52.5200";
       longitude = "13.405";

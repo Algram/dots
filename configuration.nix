@@ -174,6 +174,7 @@ in {
                 # "python-2.7.18.6"
                 "python-2.7.18.7"
                 "electron-19.1.9"
+                "electron-25.9.0"
               ];
 
   services.printing.enable = true;
@@ -181,7 +182,7 @@ in {
   services.avahi.enable = true;
   # Important to resolve .local domains of printers, otherwise you get an error
   # like  "Impossible to connect to XXX.local: Name or service not known"
-  services.avahi.nssmdns = true;
+  services.avahi.nssmdns4 = true;
 
   # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
   xdg.portal = {
@@ -253,7 +254,7 @@ in {
 
   programs.gnupg.agent = {
     enable = true;
-    pinentryFlavor = "gnome3";
+    pinentryPackage = pkgs.pinentry-gnome3;
   };
 
   environment.variables = {

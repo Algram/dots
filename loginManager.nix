@@ -93,8 +93,8 @@
     greeters.pantheon.enable = true;
   };
   services.xserver.libinput.enable = true;
-  services.xserver.layout = "us";
+  services.xserver.xkb.layout = "us";
   services.xserver.dpi = 96;
 
-  # services.gnome.gnome-keyring.enable = true;
+  services.gnome.gnome-keyring.enable = true;
 }
