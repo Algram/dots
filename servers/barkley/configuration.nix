@@ -5,37 +5,12 @@
 { config, pkgs, ... }:
 let
   secrets = import ./secrets.nix;
-  master = builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/9b295ab713858412589e61c1f7c017e29699da0f.tar.gz";
-    sha256 = "sha256:062g6fknd07yd9lg5nl1qps9gnwkqsz6wwri45js0ss35cnf9rxq";
-  };
-
-  paperless-be = pkgs.paperless-ngx.overrideAttrs (oldAttrs: rec {
-    inherit (oldAttrs) name;
-    version = "4.0.0";
-    src = pkgs.fetchFromGitHub {
-      owner = "paperless-ngx";
-      repo = "paperless-ngx";
-      rev = "27772257a8f669d575e0176c7a9af2f98395c9d6";
-      sha256 = "sha256-5zKFAbqSh8pdUGKx75sODOQr1lqD9gOi4T0e0Xnn6eE=";
-    };
-  });
-
-  # master = pkgs.fetchFromGitHub {
-  #   owner = "NixOS";
-  #   repo = "nixpkgs";
-  #   rev = "master";
-  #   sha256 = "sha256-CoYTX9hgxLo72YdMoa0sEywg4kybHbFsypHk2rCM6tM=";
-  # };
 in
 {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    "${master}/nixos/modules/services/misc/paperless.nix"
   ];
-
-  # services.squeezelite.enable = true;
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -278,22 +253,13 @@ in
     };
   };
 
-  # networking.nat.enable = true;
-  # networking.nat.internalInterfaces = ["ve-homeassistant"];
-  # networking.nat.externalInterface = "enp0s25";
-  # networking.networkmanager.unmanaged = [ "interface-name:ve-homeassistant" ];
 
   virtualisation.oci-containers = {
     backend = "podman";
-    # autoPrune = {
-    #   enable = true;
-    # };
     containers.homeassistant = {
       volumes = [
         "/home/${secrets.username}/hass:/config"
-        # "/dev/serial/by-id:/dev/serial/by-id"
       ];
-      # devices = [ "/dev/ttyUSB0:/dev/ttyUSB0" "/dev/ttyUSB1:/dev/ttyUSB1"];
       environment.TZ = "Europe/Berlin";
       image = "ghcr.io/home-assistant/home-assistant:2025.1";
       extraOptions = [
@@ -403,7 +369,6 @@ in
       ports = [ "1080:80" "2080:8080" "2443:8443" ];
       extraOptions = [
         "--privileged"
-        # "--network=host"
       ];
     };
 
@@ -431,13 +396,6 @@ in
     #       ];
     #       # entrypoint = "matter-server --storage-path /data --paa-root-cert-dir /data/credentials --bluetooth-adapter 0";
     #     };
-
-    # containers.z2m = {
-    #   volumes = [ "/home/${secrets.username}/z2m:/app/data" "/run/udev:/run/udev:ro" ];
-    #   image = "koenkk/zigbee2mqtt";
-    #   ports = [ "3081:8080" ];
-    # };
-
 
     # containers.ser2net = {
     #   volumes = [ "/home/${secrets.username}/ser2net:/data" ];
@@ -495,43 +453,14 @@ in
     };
 
     containers.neolink = {
-      # volumes = [ "/home/${secrets.username}/music-assistant:/data" ];
       volumes = [ "/home/${secrets.username}/neolink/neolink.toml:/etc/neolink.toml" ];
       image = "quantumentangledandy/neolink";
-      # restartPolicy = "always";
       extraOptions = [
         "--network=host"
         "-m=2000m"
-        # "--restart=always"
       ];
-      # ports = [ "8554:8554"];
     };
   };
-
-  # /usr/sbin/otbr-agent --rest-listen-address "::" -v -s "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-init-deassert"
-
-  # For Linux and without a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else) already in place:
-  # sudo docker run \
-  # --init \
-  # --sig-proxy=false \
-  # --name nextcloud-aio-mastercontainer \
-  # --restart always \
-  # --publish 80:80 \
-  # --publish 8080:8080 \
-  # --publish 8443:8443 \
-  # --volume nextcloud_aio_mastercontainer:/mnt/docker-aio-config \
-  # --volume /var/run/docker.sock:/var/run/docker.sock:ro \
-  # nextcloud/all-in-one:latest
-
-  # sound.enable = true;
-  # hardware = {
-
-  #   # Replaced by pipewire
-  #   # Pulseaudio needed for PS4 bluetooth controller
-  #   pulseaudio.enable = true;
-  #   pulseaudio.systemWide = true;
-  #   pulseaudio.support32Bit = true;
-  # };
 
   services.pipewire = {
     enable = true;
@@ -543,13 +472,6 @@ in
     wireplumber.enable = true;
     jack.enable = true;
   };
-
-
-  # nixpkgs.config.pulseaudio = true;
-  # services.squeezelite.enable = true;
-  # services.squeezelite.pulseAudio = true;
-
-
 
   services.redis.servers."paperless-ngx".enable = true;
   services.redis.servers."paperless-ngx".port = 6379;
@@ -565,10 +487,6 @@ in
     configureRedis = true;
     datadir = "/mnt/nextcloud";
     maxUploadSize = "16G";
-
-    # extraApps = {
-    #   inherit (config.services.nextcloud.package.packages.apps) files_retention;
-    # };
 
     caching = {
       redis = true;
@@ -599,14 +517,6 @@ in
         timeout = 1.5;
       };
       preview_imaginary_url = "https://imaginary.raphael.sh";
-      # enabledPreviewProviders = [
-      #   "OC\\Preview\\MP3"
-      #   "OC\\Preview\\TXT"
-      #   "OC\\Preview\\MarkDown"
-      #   "OC\\Preview\\OpenDocument"
-      #   "OC\\Preview\\Krita"
-      #   # "OC\\Preview\\Imaginary"
-      # ];
 
       enabledPreviewProviders = [
         "OC\\Preview\\BMP"
@@ -648,7 +558,6 @@ in
 
   services.mysql = {
     enable = true;
-    # dataDir = "/data/mysql";
     package = pkgs.mariadb;
     ensureDatabases = [ "pp" ];
     ensureUsers = [{
@@ -714,54 +623,9 @@ in
     # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
   };
 
-  # fileSystems."/mnt/paperless" = {
-  #   device = "//192.168.1.150/paperless";
-  #   fsType = "cifs";
-  #   options = let
-  #     # this line prevents hanging on network split
-  #     automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-
-  #   in ["${automount_opts},username=${secrets.paperless.samba.username},password=${secrets.paperless.samba.password},uid=315,gid=315,mfsymlinks,file_mode=0770,dir_mode=0770"];
-  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
-  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
-  # };
-
   fileSystems."/mnt/paperless" = {
     device = "192.168.1.150:/mnt/data/paperless";
     fsType = "nfs";
-  };
-
-  # fileSystems."/mnt/paperless-consume" = {
-  #   device = "//192.168.1.150/paperless-consume";
-  #   fsType = "cifs";
-  #   options = let
-  #     # this line prevents hanging on network split
-  #     automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-
-  #   in ["${automount_opts},username=${secrets.paperless.samba.username},password=${secrets.paperless.samba.password},uid=315,gid=315"];
-  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
-  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
-  # };
-
-  disabledModules = [ "services/misc/paperless.nix" ];
-
-  services.paperless = {
-    enable = false;
-    # package = paperless-be;
-    dataDir = "/mnt/paperless";
-    extraConfig = {
-      PAPERLESS_CONSUMER_POLLING = 10;
-      PAPERLESS_CONSUMER_POLLING_RETRY_COUNT = 30;
-      PAPERLESS_CONSUMER_ENABLE_BARCODES = true; # enable search for barcodes
-      PAPERLESS_CONSUMER_ENABLE_ASN_BARCODE = true;
-      PAPERLESS_CONSUMER_BARCODE_SCANNER = "ZXING";
-      PAPERLESS_CONSUMER_RECURSIVE = true;
-      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS = true;
-      PAPERLESS_OCR_LANGUAGE = "deu+eng";
-      PAPERLESS_OCR_USER_ARGS = ''{"invalidate_digital_signatures": true}'';
-    };
-    # consumptionDir = "/mnt/paperless-consume";
-    # address = "paperless.${secrets.domain}";
   };
 
   services.nginx = {
@@ -784,7 +648,6 @@ in
       };
     };
 
-    # systemctl status acme-node-red.${secrets.domain}.service
     virtualHosts."node-red.${secrets.domain}" = {
       useACMEHost = "grafana.${secrets.domain}";
       forceSSL = true;
@@ -952,70 +815,6 @@ in
   hardware.bluetooth.enable = true; # enables support for Bluetooth
   hardware.bluetooth.powerOnBoot = true;
 
-  # security.acme.certs."nas.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."3d.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."wallbox.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."nextcloud.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."paperless.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."home.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."node-red.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
-  # security.acme.certs."influxdb.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
-
   security.acme.certs."grafana.${secrets.domain}" = {
     domain = "*.${secrets.domain}";
     group = "nginx";
@@ -1031,14 +830,6 @@ in
     dnsResolver = "1.1.1.1:53";
     credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
   };
-
-  # security.acme.certs."esphome.${secrets.domain}" = {
-  #   domain = "*.${secrets.domain}";
-  #   group = "nginx";
-  #   dnsProvider = "cloudflare";
-  #   dnsResolver = "1.1.1.1:53";
-  #   credentialsFile = builtins.toFile "cloudflare-acme-credentials.env" secrets.acme.cloudflare.credentials;
-  # };
 
   programs.zsh = {
     enable = true;
@@ -1087,8 +878,6 @@ in
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 5201 4003 8095 3483 9000 9090 8097 8098 ]; # 4003 govee lan local
 
   environment.systemPackages = with pkgs; [ php rrsync vim zsh git netavark powertop htop esphome samba zxing zxing-cpp python311Packages.zxing_cpp ustreamer quickemu virt-manager ]; # netavark needed for podman at the moment
-  # virtualisation.libvirtd.enable = true;
-  # virtualisation.libvirtd.qemuOvmf = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

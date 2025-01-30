@@ -141,8 +141,8 @@
       workspaceAutoBackAndForth = true;
 
       keybindings =
-        let modifier = config.wayland.windowManager.sway.config.modifier;
-          # let modifier = "Mod4";
+        let
+          modifier = config.wayland.windowManager.sway.config.modifier;
         in
         lib.mkOptionDefault {
           "${modifier}+Return" = "exec kitty";

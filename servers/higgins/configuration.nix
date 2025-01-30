@@ -12,44 +12,14 @@ in
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./boot.nix
+    ./wol.nix
+    ./multimedia.nix
   ];
 
-  # security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true;
 
-  boot = {
 
-    plymouth = {
-      enable = true;
-      theme = "rings";
-      themePackages = with pkgs; [
-        # By default we would install all themes
-        (adi1090x-plymouth-themes.override {
-          selected_themes = [ "rings" ];
-        })
-      ];
-    };
-
-    # Enable "Silent Boot"
-    consoleLogLevel = 0;
-    initrd.verbose = false;
-    kernelParams = [
-      "quiet"
-      "splash"
-      "boot.shell_on_fail"
-      "loglevel=3"
-      "rd.systemd.show_status=false"
-      "rd.udev.log_level=3"
-      "udev.log_priority=3"
-    ];
-    # Hide the OS choice for bootloaders.
-    # It's still possible to open the bootloader list by pressing any key
-    # It will just not appear on screen unless a key is pressed
-    loader.timeout = 0;
-
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
-  };
 
   swapDevices = [{
     device = "/var/lib/swapfile";
@@ -77,28 +47,6 @@ in
     extraGroups = [ "wheel" "docker" "video" "audio" "pipewire" ];
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
-
-  nixpkgs.config.packageOverrides = pkgs: {
-    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
-  };
-  hardware.opengl = {
-    # hardware.graphics since NixOS 24.11
-    enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver # LIBVA_DRIVER_NAME=iHD
-      intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-      libvdpau-va-gl
-    ];
-  };
-
-  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; }; # Force intel-media-driver
-
-  # services.cron = {
-  #   enable = false;
-  #   systemCronJobs = [
-  #     ''0 1 * * *     root   podman exec --user "$(id -u):$(id -g)" -it influxdb influx backup /home/influxdb/backup/ -t ${secrets.influxdb.admin.token}''
-  #   ];
-  # };
 
   nixpkgs.config.allowUnfree = true;
 
@@ -189,203 +137,12 @@ in
     libdrm
   ];
 
-  services.gvfs.enable = true;
-
-  # programs.hyprland.enable = false; # enable Hyprland
-  # programs.hyprland.xwayland.enable = false;
-
-  services.greetd = {
-    enable = true;
-    settings = {
-      initial_session = {
-        command = "${session}";
-        user = "${secrets.username}";
-      };
-      default_session = {
-        # https://brad-x.com/posts/quick-tip-setting-the-color-space-value-in-wayland/
-        command = "proptest -M i915 -D /dev/dri/card1 112 connector 101 1 && ${tuigreet} --greeting 'Welcome to NixOS!' --asterisks --remember --remember-user-session --time -cmd ${session}";
-        user = "greeter";
-      };
-    };
-  };
-
-
-  systemd.user.services.snapclient-local = {
-    wantedBy = [
-      "pipewire.service"
-    ];
-    after = [
-      "pipewire.service"
-    ];
-    serviceConfig = {
-      ExecStart = "${pkgs.snapcast}/bin/snapclient -h 192.168.1.152 --hostID living-room";
-    };
-  };
-
-  #       systemd.user.services.snapcast-sink = {
-  #   wantedBy = [
-  #     "pipewire.service"
-  #   ];
-  #   after = [
-  #     "pipewire.service"
-  #   ];
-  #   bindsTo = [
-  #     "pipewire.service"
-  #   ];
-  #   path = with pkgs; [
-  #     gawk
-  #     pulseaudio
-  #   ];
-  #   script = ''
-  #     pactl load-module module-pipe-sink file=/run/snapserver/pipewire sink_name=Snapcast format=s16le rate=48000
-  #   '';
-  # };
-
-  #   systemd.services.kodi = let
-  #   package = pkgs.kodi-gbm.withPackages (kodiPkgs: [
-  #     kodiPkgs.inputstream-adaptive
-  #     kodiPkgs.netflix
-  #     kodiPkgs.sendtokodi
-  #     kodiPkgs.youtube
-  #   ]);
-  # in {
-  #   description = "Kodi media center";
-
-  #   wantedBy = ["multi-user.target"];
-  #   after = [
-  #     "network-online.target"
-  #     "sound.target"
-  #     "systemd-user-sessions.service"
-  #   ];
-  #   wants = [
-  #     "network-online.target"
-  #   ];
-
-  #   serviceConfig = {
-  #     Environment = [
-  # "DISPLAY=:0.0"
-  # "WAYLAND_DISPLAY=wayland-0"
-  #     ];
-  #     Type = "simple";
-  #     User = "higgins";
-  #     ExecStart = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-  #     Restart = "always";
-  #     TimeoutStopSec = "15s";
-  #     TimeoutStopFailureMode = "kill";
-
-  #     # Hardening
-
-  #   };
-  # };
-
-  #  security.polkit = {
-  #     extraConfig = ''
-  #       polkit.addRule(function(action, subject) {
-  #               return polkit.Result.YES;s
-  #       });
-  #     '';
-  #   };
-
-  hardware = {
-    graphics = {
-      enable = true;
-      extraPackages = with pkgs; [
-        vaapiVdpau
-        libvdpau-va-gl
-      ];
-    };
-  };
-
-
-  # services.xserver.enable = true;
-  # services.xserver.desktopManager.kodi.enable = true;
-  # services.xserver.displayManager.autoLogin.enable = true;
-  # services.xserver.displayManager.autoLogin.user = "higgins";
-  # services.xserver.displayManager.lightdm.greeter.enable = false;
-
-  # Define a user account
-  # users.extraUsers.kodi.isNormalUser = true;
-
-  # users.extraUsers.kodi.isNormalUser = true;
-  # # users.extraUsers.kodi.extraGroups = [ "data" "video" "audio" "input" ];
-  # services.cage.user = "higgins";
-  # services.cage.program = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-  # services.cage.enable = true;
-
-  services.pipewire = {
-    enable = true;
-    socketActivation = true;
-    audio.enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    wireplumber.enable = true;
-    jack.enable = true;
-  };
-
   security.polkit.enable = true;
 
-  xdg.portal = {
-    enable = true;
-    wlr = {
-      enable = true;
-      settings = {
-        screencast = {
-          chooser_type = "simple";
-          chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
-        };
-      };
-      # settings = {
-      #   screencast = {
-
-      #     # output_name = "eDP-1";
-      #     max_fps = 30;
-      #     # exec_before = "pkill mako";
-      #     # exec_after = "mako";
-      #     chooser_type = "none";
-      #     output_name = "HDMI-A-1";
-
-      #   #             chooser_type = "simple";
-      #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-      #   };
-      #           screencast = { 
-      #   max_fps = 30; 
-      #   chooser_type = "simple";
-      #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-      # };
-      # };
-    };
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-      xdg-desktop-portal-wlr
-      xdg-desktop-portal-hyprland
-    ];
-  };
-
   programs = {
-    # hyprland = {
-    #   enable = true;
-    # };
     xwayland = {
       enable = true;
     };
-  };
-
-  networking.interfaces.enp0s31f6.wakeOnLan = {
-    enable = true;
-  };
-
-  # Use a systemd service to persist the setting
-  systemd.services.wol = {
-    description = "Enable Wake-on-LAN";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.ethtool}/bin/ethtool -s enp0s31f6 wol g";
-      RemainAfterExit = true;
-    };
-    wantedBy = [ "multi-user.target" ];
   };
 
   # Open ports in the firewall.
