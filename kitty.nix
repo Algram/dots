@@ -7,6 +7,10 @@
       wheel_scroll_multiplier = "32.0";
       touch_scroll_multiplier = "32.0";
       confirm_os_window_close = 0;
+      repaint_delay = 8;
+      input_delay = 0;
+      sync_to_monitor = "no";
+      allow_remote_control = "yes";
     };
 
     keybindings = {

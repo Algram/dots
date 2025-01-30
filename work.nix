@@ -11,7 +11,6 @@ in
     google-chrome
     nodejs-18_x
     python
-    # python38Packages.pip
     libreoffice
     nodePackages.pnpm
   ];

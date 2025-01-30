@@ -141,8 +141,8 @@
       workspaceAutoBackAndForth = true;
 
       keybindings =
-        let modifier = config.wayland.windowManager.sway.config.modifier;
-          # let modifier = "Mod4";
+        let
+          modifier = config.wayland.windowManager.sway.config.modifier;
         in
         lib.mkOptionDefault {
           "${modifier}+Return" = "exec kitty";
@@ -236,6 +236,14 @@
       titlebar_border_thickness 0
       titlebar_padding 8
       default_border pixel 0
+
+      # client.unfocused $color8 $background $foreground $color0 $color8
+      # client.focused_inactive $color8 $color8 $foreground $color0 $color8
+      # client.focused $color0 $background $foreground $color0 $color15
+      # title_align left
+      # titlebar_border_thickness 0
+      # titlebar_padding 0 16 16 16
+      # default_border normal 0 
 
       set $gnome-schema org.gnome.desktop.interface
 
