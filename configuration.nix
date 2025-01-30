@@ -233,6 +233,19 @@ in {
     wireplumber.enable = true;
   };
 
+
+    systemd.user.services.snapclient-local = {
+    wantedBy = [
+      "pipewire.service"
+    ];
+    after = [
+      "pipewire.service"
+    ];
+    serviceConfig = {
+      ExecStart = "${pkgs.snapcast}/bin/snapclient -h 192.168.1.152 --hostID workstation";
+    };
+  };
+
   services.openssh = {
     enable = true;
     settings = {

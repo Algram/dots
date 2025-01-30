@@ -69,6 +69,20 @@ in {
         path = "1utyytkx.default";
       };
     };
+    
+    # systemd.user.startServices = true;
+    # systemd.user.services.squeezelite-user =
+    #   let name = "workstation";
+    #       server = "default";
+    #   in {
+    #     Unit.Description = "squeezelite player";
+    #     Unit.After = [ "network-online.target" "sound.target" ];
+    #     Install.WantedBy = [ "graphical-session.target" ];
+    #     Service = {
+    #       ExecStartPre="/run/current-system/sw/bin/sleep 5";
+    #       ExecStart = "${pkgs.squeezelite-pulse}/bin/squeezelite-pulse -n ${name} -s ${server} -d all=info";
+    #     };
+    #   };
 
 
     programs.obs-studio = {
@@ -84,6 +98,11 @@ in {
       latitude = "52.5200";
       longitude = "13.405";
       temperature = { night = 3000; };
+      # settings = {
+      #   randr = {
+      #     screen = 0;
+      #   };
+      # };
     };
 }
 

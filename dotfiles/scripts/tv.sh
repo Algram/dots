@@ -33,6 +33,7 @@ if [ "$1" == "disable" ]; then
   swaymsg output HDMI-A-1 disable
   # pkill -SIGINT obs
   pactl set-default-sink alsa_output.usb-C-Media_Electronics_Inc._USB_Audio_Device-00.analog-stereo
+  pkill -SIGUSR1 gammastep
 elif [ "$1" == "enable" ]; then
   # /nix/store/2572f7khdk9yj18h56igpl7g159isxw8-xdg-desktop-portal-wlr-0.7.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
   # /nix/store/18mrryi6z1bw9yzgj3lrb9xbrgmm0pwa-xdg-desktop-portal-wlr-0.7.0/libexec/xdg-desktop-portal-wlr -r -lTRACE -c /etc/nixos/dotfiles/scripts/wlr-config.conf &
@@ -52,6 +53,7 @@ elif [ "$1" == "enable" ]; then
   # env QT_QPA_PLATFORM=wayland obs
   pactl set-default-sink alsa_output.pci-0000_0c_00.4.analog-surround-51
   # pactl set-default-sink alsa_output.pci-0000_0c_00.4.iec958-stereo
+  pkill -SIGUSR1 gammastep
 fi
 
 

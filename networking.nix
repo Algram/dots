@@ -12,6 +12,6 @@ in {
     interfaces.enp6s0.useDHCP = true;
     networkmanager = { enable = true; };
 
-    firewall.enable = true;
+    firewall.enable = false;
   };
 }

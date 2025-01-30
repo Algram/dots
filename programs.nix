@@ -1,11 +1,21 @@
 { config, pkgs, ... }:
 let
-  nix-software-center = import (pkgs.fetchFromGitHub {
-    owner = "vlinkz";
-    repo = "nix-software-center";
-    rev = "0.1.2";
-    sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
-  }) {};
+  # nix-software-center = import (pkgs.fetchFromGitHub {
+  #   owner = "vlinkz";
+  #   repo = "nix-software-center";
+  #   rev = "0.1.2";
+  #   sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
+  # }) {};
+
+    #    pkgs2 = import (builtins.fetchGit {
+    #      # Descriptive name to make the store path easier to identify
+    #      name = "my-old-revision";
+    #      url = "https://github.com/NixOS/nixpkgs/";
+    #      ref = "refs/heads/nixpkgs-unstable";
+    #      rev = "e89cf1c932006531f454de7d652163a9a5c86668";
+    #  }) {};
+
+    #  myPkg = pkgs2.kodiPackages.kodi;
 in {
   nixpkgs.config = {
     allowUnfree = true;
@@ -27,6 +37,18 @@ in {
   services.accounts-daemon.enable = true;
   services.gnome.gnome-online-accounts.enable = true;
 
+  services.ollama = {
+  enable = true;
+  acceleration = "rocm";
+    environmentVariables = {
+    HCC_AMDGPU_TARGET = "gfx1010"; # used to be necessary, but doesn't seem to anymore
+  };
+  rocmOverrideGfx = "10.1.0";
+};
+
+  # services.squeezelite.enable = true;
+  # services.squeezelite.pulseAudio = true;
+
   environment.systemPackages = with pkgs; [
     # nix-software-center
     qt5.qtwayland
@@ -38,6 +60,7 @@ in {
     (pkgs.steam.override { extraLibraries = pkgs: [ pkgs.pipewire ]; })
     appimage-run
     ddccontrol
+    wol
     d-spy
     discord
     dropbox
@@ -50,6 +73,10 @@ in {
     inkscape
     # orca-slicer
     evolution
+    gnumake
+    gcc
+    cmake
+    opencv
     # esphome_pr
     # For pactl
     gnome-control-center
@@ -154,5 +181,14 @@ in {
     # gnome.mission-control
     # pass-wayland
     keepmenu
+    rpi-imager
+    # kodi
+    # myPkg
+    kodi-wayland
   ];
+
+#   services.plex = {
+#   enable = true;
+#   openFirewall = true;
+# };
 }

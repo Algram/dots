@@ -33,6 +33,8 @@ in {
     "${master}/nixos/modules/services/misc/paperless.nix"
   ];
 
+  # services.squeezelite.enable = true;
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -49,29 +51,47 @@ in {
     };
   };
 
+    systemd.user.services.snapclient-local = {
+    wantedBy = [
+      "pipewire.service"
+    ];
+    after = [
+      "pipewire.service"
+    ];
+    serviceConfig = {
+      ExecStart = "${pkgs.snapcast}/bin/snapclient -h 192.168.1.152 --hostID office";
+    };
+  };
+
   services.fwupd.enable = true;
+
+
+  # Start WirePlumber (with PipeWire) at boot.
+  systemd.user.services.wireplumber.wantedBy = [ "default.target" ];
 
   users.defaultUserShell = pkgs.zsh;
   users.users.${secrets.username} = {
+    linger = true;
     isNormalUser = true;
     home = "/home/${secrets.username}";
-    extraGroups = [ "wheel" "docker" "postgres" ];
+    extraGroups = [ "wheel" "docker" "postgres" "libvirtd" "audio" ];
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
 
   services.cron = {
-    enable = false;
+    enable = true;
     systemCronJobs = [
-      ''0 1 * * *     root   podman exec --user "$(id -u):$(id -g)" -it influxdb influx backup /home/influxdb/backup/ -t ${secrets.influxdb.admin.token}''
+      # ''0 1 * * *     root   podman exec --user "$(id -u):$(id -g)" -it influxdb influx backup /home/influxdb/backup/ -t ${secrets.influxdb.admin.token}''
+      ''1 * * * * root systemctl stop podman-neolink.service && sudo systemctl start podman-neolink.service ''
     ];
   };
 
   nixpkgs.config.allowUnfree = true;
 
-  services.unifi.enable = false;
-  services.unifi.openFirewall = false;
+  services.unifi.enable = true;
+  services.unifi.openFirewall = true;
   services.unifi.unifiPackage = pkgs.unifi;
-  # services.unifi.mongodbPackage = pkgs.mongodb-6_0;
+  services.unifi.mongodbPackage = pkgs.mongodb-ce;
 
   security.sudo = {
     enable = true;
@@ -273,7 +293,7 @@ in {
       ];
       # devices = [ "/dev/ttyUSB0:/dev/ttyUSB0" "/dev/ttyUSB1:/dev/ttyUSB1"];
       environment.TZ = "Europe/Berlin";
-      image = "ghcr.io/home-assistant/home-assistant:2024.11";
+      image = "ghcr.io/home-assistant/home-assistant:2025.1";
       extraOptions = [ 
         "--privileged"
         "--network=host"
@@ -391,14 +411,31 @@ in {
       ports = [ "3080:3080" ];
     };
 
-    containers.matter-server = {
-      volumes = [ "/home/${secrets.username}/matter-server:/data" ];
-      image = "ghcr.io/home-assistant-libs/python-matter-server:stable";
-      extraOptions = [
-        "--security-opt=apparmor=unconfined"
-        "--network=host"
-      ];
-    };
+#     containers.matter-server = {
+#       volumes = [ "/home/${secrets.username}/matter-server:/data" "/run/dbus:/run/dbus:ro" ];
+#       image = "ghcr.io/home-assistant-libs/python-matter-server:stable";
+#       extraOptions = [
+#         "--security-opt=apparmor=unconfined"
+#         "--network=host"
+#         # ''--sysctl=net.ipv6.conf.all.disable_ipv6=0''
+#         #         ''--sysctl=net.ipv6.conf.all.accept_ra_rt_info_max_plen=64''
+#         # ''--sysctl=net.ipv6.conf.all.accept_ra=1''
+#       ];
+#       cmd = [
+# "--storage-path=/data"
+# "--paa-root-cert-dir=/data/credentials"
+# "--bluetooth-adapter=0"
+# "--log-level=debug"
+#       ];
+#       # entrypoint = "matter-server --storage-path /data --paa-root-cert-dir /data/credentials --bluetooth-adapter 0";
+#     };
+
+    # containers.z2m = {
+    #   volumes = [ "/home/${secrets.username}/z2m:/app/data" "/run/udev:/run/udev:ro" ];
+    #   image = "koenkk/zigbee2mqtt";
+    #   ports = [ "3081:8080" ];
+    # };
+
     
     # containers.ser2net = {
     #   volumes = [ "/home/${secrets.username}/ser2net:/data" ];
@@ -411,16 +448,26 @@ in {
     
     # TODO make var lib docker or so persisted
     # containers.otbr = {
-    #   image = "openthread/otbr";
-    #   volumes = [ "/home/barkley/ttyOTBR:/tmp/ttyOTBR" "/home/barkley/otbr/thread:/var/lib/thread" ];
+    #   image = "openthread/otbr:test";
+    #   volumes = [ "/dev/ttyUSB0:/tmp/ttyOTBR" "/home/barkley/otbr/thread:/var/lib/thread" ];
     #   ports = [ "8081:80" "3081:8081"];
     #   # cmd = [
     #   #   "--radio-url spinel+hdlc+uart:///dev/ttyUSB1?uart-baudrate=460800"
     #   # ];
+    #   # entrypoint = 
+    #   #       ''/usr/sbin/otbr-agent" \
+    #   #   --rest-listen-address "::" \
+    #   #       -v -s \
+    #   #   "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-init-deassert"''
+    #   # ;
+    #   # entrypoint = "/usr/sbin/otbr-agent --help";
     #   environment = {
-    #     RADIO_URL = "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-flow-control";
-    #     TREL_URL = "trel://enp0s31f6";
-    #     DHCPV6_PD_REF = "0";        
+    #     # RADIO_URL = "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-flow-control";
+    #     RADIO_URL = "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-init-deassert";
+    #     # RADIO_URL = "spinel+hdlc+uart:///tmp/ttyOTBR";
+    #     # TREL_URL = "trel://enp0s31f6";
+    #     # DHCPV6_PD_REF = "0";
+    #     # BACKBONE_INTERFACE = "enp0s31f6";        
     #   };
     #   extraOptions = [
     #     ''--sysctl=net.ipv6.conf.all.disable_ipv6=0''
@@ -433,10 +480,10 @@ in {
     #     # "--network=host"
     #   ];
     # };
-
+    
     containers.music-assistant = {
       volumes = [ "/home/${secrets.username}/music-assistant:/data" ];
-      image = "ghcr.io/music-assistant/server";
+      image = "ghcr.io/music-assistant/server:2.4.0b20";
       extraOptions = [
         "--cap-add=DAC_READ_SEARCH"
         "--cap-add=SYS_ADMIN"
@@ -444,7 +491,22 @@ in {
         "--network=host"
       ];
     };
+
+    containers.neolink = {
+      # volumes = [ "/home/${secrets.username}/music-assistant:/data" ];
+      volumes = [ "/home/${secrets.username}/neolink/neolink.toml:/etc/neolink.toml" ];
+      image = "quantumentangledandy/neolink";
+      # restartPolicy = "always";
+      extraOptions = [
+        "--network=host"
+        "-m=2000m"
+        # "--restart=always"
+      ];
+      # ports = [ "8554:8554"];
+    };
   };
+
+  # /usr/sbin/otbr-agent --rest-listen-address "::" -v -s "spinel+hdlc+uart:///tmp/ttyOTBR?uart-baudrate=460800&uart-init-deassert"
 
   # For Linux and without a web server or reverse proxy (like Apache, Nginx, Caddy, Cloudflare Tunnel and else) already in place:
 # sudo docker run \
@@ -458,6 +520,34 @@ in {
 # --volume nextcloud_aio_mastercontainer:/mnt/docker-aio-config \
 # --volume /var/run/docker.sock:/var/run/docker.sock:ro \
 # nextcloud/all-in-one:latest
+
+  # sound.enable = true;
+  # hardware = {
+
+  #   # Replaced by pipewire
+  #   # Pulseaudio needed for PS4 bluetooth controller
+  #   pulseaudio.enable = true;
+  #   pulseaudio.systemWide = true;
+  #   pulseaudio.support32Bit = true;
+  # };
+
+  services.pipewire = {
+    enable = true;
+    socketActivation = false;
+    audio.enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+    jack.enable = true;
+  };
+
+
+    # nixpkgs.config.pulseaudio = true;
+  # services.squeezelite.enable = true;
+  # services.squeezelite.pulseAudio = true;
+
+  
 
   services.redis.servers."paperless-ngx".enable = true;
   services.redis.servers."paperless-ngx".port = 6379;
@@ -635,17 +725,17 @@ in {
     fsType = "nfs";
   };
 
-  fileSystems."/mnt/paperless-consume" = {
-    device = "//192.168.1.150/paperless-consume";
-    fsType = "cifs";
-    options = let
-      # this line prevents hanging on network split
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+  # fileSystems."/mnt/paperless-consume" = {
+  #   device = "//192.168.1.150/paperless-consume";
+  #   fsType = "cifs";
+  #   options = let
+  #     # this line prevents hanging on network split
+  #     automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
 
-    in ["${automount_opts},username=${secrets.paperless.samba.username},password=${secrets.paperless.samba.password},uid=315,gid=315"];
-    # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
-    # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
-  };
+  #   in ["${automount_opts},username=${secrets.paperless.samba.username},password=${secrets.paperless.samba.password},uid=315,gid=315"];
+  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770,cache=loose"];
+  #   # in ["username=${secrets.nextcloud.samba.username},password=${secrets.nextcloud.samba.password},uid=993,gid=990,mfsymlinks,file_mode=0770,dir_mode=0770"];
+  # };
 
   disabledModules = [ "services/misc/paperless.nix" ];
 
@@ -698,6 +788,15 @@ in {
         };
       };
 
+      virtualHosts."music.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8095";
+          proxyWebsockets = true;
+        };
+      };
+
       virtualHosts."imaginary.${secrets.domain}" =  {
         useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
@@ -725,11 +824,20 @@ in {
         };
       };
 
-      virtualHosts."otbr.${secrets.domain}" =  {
+      virtualHosts."z2m.${secrets.domain}" =  {
         useACMEHost = "grafana.${secrets.domain}";
         forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:3081";
+          proxyWebsockets = true;
+        };
+      };
+
+      virtualHosts."neolink.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8554";
           proxyWebsockets = true;
         };
       };
@@ -761,14 +869,14 @@ in {
         };
       };
 
-      # virtualHosts."unifi.${secrets.domain}" =  {
-      #   useACMEHost = "unifi.${secrets.domain}";
-      #   forceSSL = true;
-      #   locations."/" = {
-      #     proxyPass = "https://127.0.0.1:8443";
-      #     proxyWebsockets = true;
-      #   };
-      # };
+      virtualHosts."unifi.${secrets.domain}" =  {
+        useACMEHost = "grafana.${secrets.domain}";
+        forceSSL = true;
+        locations."/" = {
+          proxyPass = "https://127.0.0.1:8443";
+          proxyWebsockets = true;
+        };
+      };
 
       virtualHosts."esphome.${secrets.domain}" =  {
         useACMEHost = "grafana.${secrets.domain}";
@@ -834,6 +942,9 @@ in {
     acceptTerms = true;
     defaults.email = "aliasgram@gmail.com";
   };
+
+      hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true;
 
   # security.acme.certs."nas.${secrets.domain}" = {
   #   domain = "*.${secrets.domain}";
@@ -963,11 +1074,15 @@ in {
 
   services.logind.lidSwitch = "ignore";
 
+  networking.firewall.enable = false;
+
   # 9522 for SMA Home Manager multicast messages "1080:80" "2080:8080" "2443:8443"
-  networking.firewall.allowedTCPPorts = [ 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 6052 28981 5201 8088 8000 1080 2080 2443 8081 8095 3483 9000 9090 8097 8098]; # 6052 for esphome, 28981 for paperless, 8088 for imaginary
+  networking.firewall.allowedTCPPorts = [ 8554 5900 80 443 8123 6053 1883 8883 8080 8880 8843 8443 3000 8086 9522 6052 28981 5201 8088 8000 1080 2080 2443 8081 8095 3483 9000 9090 8097 8098 5580 3081]; # 6052 for esphome, 28981 for paperless, 8088 for imaginary
   networking.firewall.allowedUDPPorts = [ 5353 3478 10001 9522 5201 4003 8095 3483 9000 9090 8097 8098 ]; # 4003 govee lan local
 
-  environment.systemPackages = with pkgs; [ php rrsync  vim zsh git netavark powertop htop esphome samba zxing zxing-cpp python311Packages.zxing_cpp ustreamer ]; # netavark needed for podman at the moment
+  environment.systemPackages = with pkgs; [ php rrsync  vim zsh git netavark powertop htop esphome samba zxing zxing-cpp python311Packages.zxing_cpp ustreamer quickemu virt-manager ]; # netavark needed for podman at the moment
+  # virtualisation.libvirtd.enable = true;
+  # virtualisation.libvirtd.qemuOvmf = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -976,5 +1091,14 @@ in {
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
+#   networking.defaultGateway = "192.168.1.1";
+# networking.bridges.br0.interfaces = ["enp0s31f6"];
+# networking.interfaces.br0 = {
+#   useDHCP = false;
+#   ipv4.addresses = [{
+#     "address" = "192.168.1.152";
+#     "prefixLength" = 24;
+#   }];
+# };
 }
 
