@@ -1,12 +1,13 @@
 { config, pkgs, ... }:
 let
   secrets = import ./secrets.nix;
-in {
+in
+{
   boot.supportedFilesystems = [ "ntfs" ];
 
-  fileSystems."/home/${secrets.username}/GamesWindows" ={
+  fileSystems."/home/${secrets.username}/GamesWindows" = {
     device = "/dev/nvme0n1p3";
-    fsType = "ntfs"; 
+    fsType = "ntfs";
     options = [ "rw" ];
   };
 

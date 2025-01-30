@@ -60,7 +60,7 @@
         "2: dev" = [{ class = "Code"; }];
         "3: term" = [{ class = "Kitty"; }];
         "4: social" = [{ class = "Signal"; }];
-        "999: media" = [ { class = ".obs-wrapped"; } { class = "discord"; } {app_id = "com.obsproject.Studio"; }];
+        "999: media" = [{ class = ".obs-wrapped"; } { class = "discord"; } { app_id = "com.obsproject.Studio"; }];
       };
 
       input = {
@@ -142,8 +142,9 @@
 
       keybindings =
         let modifier = config.wayland.windowManager.sway.config.modifier;
-        # let modifier = "Mod4";
-        in lib.mkOptionDefault {
+          # let modifier = "Mod4";
+        in
+        lib.mkOptionDefault {
           "${modifier}+Return" = "exec kitty";
           "${modifier}+t" = "exec kitty";
           # "${modifier}+b" = "exec kitty";

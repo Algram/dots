@@ -2,7 +2,7 @@
   username = "";
   hostname = "";
 
-  openssh.authorizedKeys.keys = [];
+  openssh.authorizedKeys.keys = [ ];
 
   domain = "";
 

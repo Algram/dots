@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let secrets = import ./secrets.nix;
-in {
+in
+{
   networking = {
     hostName = secrets.hostname;
     extraHosts = secrets.networking.extraHosts;

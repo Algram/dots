@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let secrets = import ./secrets.nix;
-in {
+in
+{
   virtualisation.docker.enable = true;
 
   users.users.${secrets.username}.extraGroups = [ "docker" ];

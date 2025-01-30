@@ -2,7 +2,8 @@
 
 let
   wal = builtins.fromJSON (builtins.readFile /etc/nixos/dotfiles/colors.json);
-in {
+in
+{
   services.mako = {
     enable = true;
 

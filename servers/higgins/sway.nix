@@ -133,8 +133,9 @@
 
       keybindings =
         let modifier = config.wayland.windowManager.sway.config.modifier;
-        # let modifier = "Mod4";
-        in lib.mkOptionDefault {
+          # let modifier = "Mod4";
+        in
+        lib.mkOptionDefault {
           "${modifier}+Return" = "exec kitty";
           "${modifier}+t" = "exec kitty";
           # "${modifier}+b" = "exec kitty";

@@ -7,7 +7,8 @@ let
   secrets = import ./secrets.nix;
   tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
   session = "${pkgs.sway}/bin/sway";
-in {
+in
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -16,7 +17,7 @@ in {
   # security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true;
 
-    boot = {
+  boot = {
 
     plymouth = {
       enable = true;
@@ -50,10 +51,10 @@ in {
     loader.efi.canTouchEfiVariables = true;
   };
 
-  swapDevices = [ {
+  swapDevices = [{
     device = "/var/lib/swapfile";
-    size = 16*1024;
-  } ];
+    size = 16 * 1024;
+  }];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -73,14 +74,15 @@ in {
   users.users.${secrets.username} = {
     isNormalUser = true;
     home = "/home/${secrets.username}";
-    extraGroups = [ "wheel" "docker" "video" "audio" "pipewire"];
+    extraGroups = [ "wheel" "docker" "video" "audio" "pipewire" ];
     openssh.authorizedKeys.keys = secrets.openssh.authorizedKeys.keys;
   };
 
-    nixpkgs.config.packageOverrides = pkgs: {
+  nixpkgs.config.packageOverrides = pkgs: {
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
   };
-  hardware.opengl = { # hardware.graphics since NixOS 24.11
+  hardware.opengl = {
+    # hardware.graphics since NixOS 24.11
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver # LIBVA_DRIVER_NAME=iHD
@@ -159,7 +161,7 @@ in {
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
-  
+
   system.autoUpgrade.enable = false;
 
   environment.systemPackages = with pkgs; [
@@ -175,11 +177,11 @@ in {
     uwsm
     # kodi
     (pkgs.kodi.withPackages (kodiPkgs: with kodiPkgs; [
-		inputstream-adaptive
-    youtube
-    # twitch
-    sendtokodi
-	]))
+      inputstream-adaptive
+      youtube
+      # twitch
+      sendtokodi
+    ]))
     pavucontrol
     firefox
     mpv
@@ -208,7 +210,7 @@ in {
   };
 
 
-    systemd.user.services.snapclient-local = {
+  systemd.user.services.snapclient-local = {
     wantedBy = [
       "pipewire.service"
     ];
@@ -239,50 +241,50 @@ in {
   #   '';
   # };
 
-#   systemd.services.kodi = let
-#   package = pkgs.kodi-gbm.withPackages (kodiPkgs: [
-#     kodiPkgs.inputstream-adaptive
-#     kodiPkgs.netflix
-#     kodiPkgs.sendtokodi
-#     kodiPkgs.youtube
-#   ]);
-# in {
-#   description = "Kodi media center";
+  #   systemd.services.kodi = let
+  #   package = pkgs.kodi-gbm.withPackages (kodiPkgs: [
+  #     kodiPkgs.inputstream-adaptive
+  #     kodiPkgs.netflix
+  #     kodiPkgs.sendtokodi
+  #     kodiPkgs.youtube
+  #   ]);
+  # in {
+  #   description = "Kodi media center";
 
-#   wantedBy = ["multi-user.target"];
-#   after = [
-#     "network-online.target"
-#     "sound.target"
-#     "systemd-user-sessions.service"
-#   ];
-#   wants = [
-#     "network-online.target"
-#   ];
+  #   wantedBy = ["multi-user.target"];
+  #   after = [
+  #     "network-online.target"
+  #     "sound.target"
+  #     "systemd-user-sessions.service"
+  #   ];
+  #   wants = [
+  #     "network-online.target"
+  #   ];
 
-#   serviceConfig = {
-#     Environment = [
-# "DISPLAY=:0.0"
-# "WAYLAND_DISPLAY=wayland-0"
-#     ];
-#     Type = "simple";
-#     User = "higgins";
-#     ExecStart = "${pkgs.kodi-wayland}/bin/kodi-standalone";
-#     Restart = "always";
-#     TimeoutStopSec = "15s";
-#     TimeoutStopFailureMode = "kill";
+  #   serviceConfig = {
+  #     Environment = [
+  # "DISPLAY=:0.0"
+  # "WAYLAND_DISPLAY=wayland-0"
+  #     ];
+  #     Type = "simple";
+  #     User = "higgins";
+  #     ExecStart = "${pkgs.kodi-wayland}/bin/kodi-standalone";
+  #     Restart = "always";
+  #     TimeoutStopSec = "15s";
+  #     TimeoutStopFailureMode = "kill";
 
-#     # Hardening
-    
-#   };
-# };
+  #     # Hardening
 
-#  security.polkit = {
-#     extraConfig = ''
-#       polkit.addRule(function(action, subject) {
-#               return polkit.Result.YES;s
-#       });
-#     '';
-#   };
+  #   };
+  # };
+
+  #  security.polkit = {
+  #     extraConfig = ''
+  #       polkit.addRule(function(action, subject) {
+  #               return polkit.Result.YES;s
+  #       });
+  #     '';
+  #   };
 
   hardware = {
     graphics = {
@@ -323,44 +325,44 @@ in {
 
   security.polkit.enable = true;
 
-    xdg.portal = {
+  xdg.portal = {
+    enable = true;
+    wlr = {
       enable = true;
-      wlr = {
-        enable = true;
-        settings = {
-          screencast = {
-            chooser_type = "simple";
-            chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
-          };
+      settings = {
+        screencast = {
+          chooser_type = "simple";
+          chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
         };
-        # settings = {
-        #   screencast = {
-            
-        #     # output_name = "eDP-1";
-        #     max_fps = 30;
-        #     # exec_before = "pkill mako";
-        #     # exec_after = "mako";
-        #     chooser_type = "none";
-        #     output_name = "HDMI-A-1";
-
-        #   #             chooser_type = "simple";
-        #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-        #   };
-        #           screencast = { 
-        #   max_fps = 30; 
-        #   chooser_type = "simple";
-        #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-        # };
-          # };
       };
-      extraPortals = with pkgs; [
-              xdg-desktop-portal-gtk
+      # settings = {
+      #   screencast = {
+
+      #     # output_name = "eDP-1";
+      #     max_fps = 30;
+      #     # exec_before = "pkill mako";
+      #     # exec_after = "mako";
+      #     chooser_type = "none";
+      #     output_name = "HDMI-A-1";
+
+      #   #             chooser_type = "simple";
+      #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      #   };
+      #           screencast = { 
+      #   max_fps = 30; 
+      #   chooser_type = "simple";
+      #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      # };
+      # };
+    };
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
       xdg-desktop-portal-wlr
       xdg-desktop-portal-hyprland
-      ];
+    ];
   };
 
-    programs = {
+  programs = {
     # hyprland = {
     #   enable = true;
     # };
@@ -391,7 +393,7 @@ in {
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
-# 
+  # 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

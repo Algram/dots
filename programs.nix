@@ -7,21 +7,22 @@ let
   #   sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
   # }) {};
 
-    #    pkgs2 = import (builtins.fetchGit {
-    #      # Descriptive name to make the store path easier to identify
-    #      name = "my-old-revision";
-    #      url = "https://github.com/NixOS/nixpkgs/";
-    #      ref = "refs/heads/nixpkgs-unstable";
-    #      rev = "e89cf1c932006531f454de7d652163a9a5c86668";
-    #  }) {};
+  #    pkgs2 = import (builtins.fetchGit {
+  #      # Descriptive name to make the store path easier to identify
+  #      name = "my-old-revision";
+  #      url = "https://github.com/NixOS/nixpkgs/";
+  #      ref = "refs/heads/nixpkgs-unstable";
+  #      rev = "e89cf1c932006531f454de7d652163a9a5c86668";
+  #  }) {};
 
-    #  myPkg = pkgs2.kodiPackages.kodi;
-in {
+  #  myPkg = pkgs2.kodiPackages.kodi;
+in
+{
   nixpkgs.config = {
     allowUnfree = true;
     chromium.enableWideVine = true;
   };
- 
+
   programs.steam.enable = true;
 
   nixpkgs.config.packageOverrides = pkgs: {
@@ -38,13 +39,14 @@ in {
   services.gnome.gnome-online-accounts.enable = true;
 
   services.ollama = {
-  enable = true;
-  acceleration = "rocm";
-    environmentVariables = {
-    HCC_AMDGPU_TARGET = "gfx1010"; # used to be necessary, but doesn't seem to anymore
+    enable = true;
+    acceleration = "rocm";
+    environmentVariables =
+      {
+        HCC_AMDGPU_TARGET = "gfx1010"; # used to be necessary, but doesn't seem to anymore
+      };
+    rocmOverrideGfx = "10.1.0";
   };
-  rocmOverrideGfx = "10.1.0";
-};
 
   # services.squeezelite.enable = true;
   # services.squeezelite.pulseAudio = true;
@@ -61,6 +63,7 @@ in {
     appimage-run
     ddccontrol
     wol
+    nixfmt
     d-spy
     discord
     dropbox
@@ -187,8 +190,8 @@ in {
     kodi-wayland
   ];
 
-#   services.plex = {
-#   enable = true;
-#   openFirewall = true;
-# };
+  #   services.plex = {
+  #   enable = true;
+  #   openFirewall = true;
+  # };
 }

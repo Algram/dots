@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let secrets = import ./secrets.nix;
-in {
+in
+{
   systemd.services.notify-on-shutdown = {
     enable = true;
     description = "Notify on shutdown";
@@ -9,9 +10,9 @@ in {
       After = "network-online.target";
     };
     serviceConfig = {
-        ExecStop = "/etc/nixos/dotfiles/scripts/notify-node-red.sh";
-        Type = "oneshot";
-        RemainAfterExit = true;
+      ExecStop = "/etc/nixos/dotfiles/scripts/notify-node-red.sh";
+      Type = "oneshot";
+      RemainAfterExit = true;
     };
     wantedBy = [ "default.target" ];
   };

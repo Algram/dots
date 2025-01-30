@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 let secrets = import ./secrets.nix;
-in {
+in
+{
   # services.xserver.enable = true;
   # services.xserver.displayManager.defaultSession = "sway";
   # services.xserver.displayManager.lightdm = {

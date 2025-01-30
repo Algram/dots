@@ -1,7 +1,8 @@
 { config, pkgs, lib, ... }:
 let
   secrets = import ./secrets.nix;
-in {
+in
+{
   programs.starship.enable = true;
 
   programs.zsh = {

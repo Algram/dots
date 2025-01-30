@@ -1,7 +1,8 @@
 { config, pkgs, lib, ... }:
 
 let wal = builtins.fromJSON (builtins.readFile /etc/nixos/dotfiles/colors.json);
-in {
+in
+{
   programs.waybar = {
     enable = true;
     # TODO check what this does

@@ -5,7 +5,8 @@
 { config, pkgs, lib, fetchFromGitHub, ... }:
 let
   secrets = import ./secrets.nix;
-in {
+in
+{
   imports = [
     ./hardware-configuration.nix # Include the results of the hardware scan.
     ./loginManager.nix
@@ -14,7 +15,6 @@ in {
     ./programs.nix
     ./work.nix
     ./networking.nix
-    ./syncthing.nix
     ./mounts.nix
     ./virtualization.nix
     ./systemd.nix
@@ -102,7 +102,6 @@ in {
       "wheel"
       "networkmanager"
       "audio"
-      "syncthing"
       "i2c"
       "i2c-dev"
       "backlight"
@@ -150,34 +149,34 @@ in {
     #   defaultFonts.monospace = [ "Roboto Mono" ];
     # };
 
-      # fontconfig = {
-      #   # Fixes pixelation
-      #   antialias = true;
+    # fontconfig = {
+    #   # Fixes pixelation
+    #   antialias = true;
 
-      #   # Fixes antialiasing blur
-      #   hinting = {
-      #     enable = true;
-      #     style = "hintfull"; # no difference
-      #     autohint = true; # no difference
-      #   };
+    #   # Fixes antialiasing blur
+    #   hinting = {
+    #     enable = true;
+    #     style = "hintfull"; # no difference
+    #     autohint = true; # no difference
+    #   };
 
-      #   subpixel = {
-      #     # Makes it bolder
-      #     rgba = "rgb";
-      #     lcdfilter = "default"; # no difference
-      #   };
-      # };
+    #   subpixel = {
+    #     # Makes it bolder
+    #     rgba = "rgb";
+    #     lcdfilter = "default"; # no difference
+    #   };
+    # };
   };
 
-           nixpkgs.config.permittedInsecurePackages = [
-                # "python-2.7.18.6"
-                "python-2.7.18.7"
-                "electron-19.1.9"
-                "electron-25.9.0"
-                "python-2.7.18.8"
-                "python3.12-youtube-dl-2021.12.17"
-                "jitsi-meet-1.0.8043"
-              ];
+  nixpkgs.config.permittedInsecurePackages = [
+    # "python-2.7.18.6"
+    "python-2.7.18.7"
+    "electron-19.1.9"
+    "electron-25.9.0"
+    "python-2.7.18.8"
+    "python3.12-youtube-dl-2021.12.17"
+    "jitsi-meet-1.0.8043"
+  ];
 
   services.printing.enable = true;
   services.printing.drivers = with pkgs; [ brlaser ];
@@ -188,39 +187,39 @@ in {
 
   # https://github.com/NixOS/nixpkgs/issues/156830#issuecomment-1022400623
   xdg.portal = {
+    enable = true;
+    wlr = {
       enable = true;
-      wlr = {
-        enable = true;
-        settings = {
-          screencast = {
-            chooser_type = "simple";
-            chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
-          };
+      settings = {
+        screencast = {
+          chooser_type = "simple";
+          chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -ro";
         };
-        # settings = {
-        #   screencast = {
-            
-        #     # output_name = "eDP-1";
-        #     max_fps = 30;
-        #     # exec_before = "pkill mako";
-        #     # exec_after = "mako";
-        #     chooser_type = "none";
-        #     output_name = "HDMI-A-1";
-
-        #   #             chooser_type = "simple";
-        #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-        #   };
-        #           screencast = { 
-        #   max_fps = 30; 
-        #   chooser_type = "simple";
-        #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
-        # };
-          # };
       };
-      extraPortals = with pkgs; [
-        xdg-desktop-portal-wlr
-        xdg-desktop-portal-gtk
-      ];
+      # settings = {
+      #   screencast = {
+
+      #     # output_name = "eDP-1";
+      #     max_fps = 30;
+      #     # exec_before = "pkill mako";
+      #     # exec_after = "mako";
+      #     chooser_type = "none";
+      #     output_name = "HDMI-A-1";
+
+      #   #             chooser_type = "simple";
+      #   # chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      #   };
+      #           screencast = { 
+      #   max_fps = 30; 
+      #   chooser_type = "simple";
+      #   chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+      # };
+      # };
+    };
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-wlr
+      xdg-desktop-portal-gtk
+    ];
   };
 
   security.rtkit.enable = true;
@@ -234,7 +233,7 @@ in {
   };
 
 
-    systemd.user.services.snapclient-local = {
+  systemd.user.services.snapclient-local = {
     wantedBy = [
       "pipewire.service"
     ];
@@ -294,7 +293,7 @@ in {
   hardware.bluetooth.enable = true; # enables support for Bluetooth
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
-    hardware.bluetooth.package = pkgs.bluez.overrideAttrs (oldAttrs: {
+  hardware.bluetooth.package = pkgs.bluez.overrideAttrs (oldAttrs: {
     configureFlags = oldAttrs.configureFlags ++ [ "--enable-sixaxis" ];
   });
 
