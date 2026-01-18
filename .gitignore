@@ -6,3 +6,4 @@ hardware-configuration.nix
 !servers/**/hardware-configuration.nix
 .terraform*
 terraform*
+dynamic.yml
